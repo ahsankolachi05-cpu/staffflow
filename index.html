@@ -1,0 +1,1915 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>StaffFlow — Workforce Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        color-scheme: light dark;
+        --navy:#0A2540; --navy-2:#10365C; --navy-soft:#E8F0FE;
+        --bg:#F3F6FB; --surface:#FFFFFF; --surface-2:#EDF3FB; --surface-3:#F7FAFD;
+        --border:#D9E4F2; --border-strong:#C3D3E8;
+        --text:#132A44; --muted:#5B7186; --faint:#8598AD;
+        --blue:#2F6FED; --blue-dark:#1D4FD0;
+        --green:#16A34A; --green-bg:#E6F6EC; --green-dark:#15803D;
+        --amber:#B45309; --amber-dot:#F59E0B; --amber-bg:#FEF3DC;
+        --red:#DC2626; --red-bg:#FDECEC;
+        --shadow-sm:0 1px 2px rgba(10,37,64,.05),0 1px 3px rgba(10,37,64,.06);
+        --shadow-md:0 6px 18px rgba(10,37,64,.10),0 2px 6px rgba(10,37,64,.06);
+        --shadow-lg:0 24px 60px rgba(10,37,64,.22);
+        --radius:14px;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0A1524; --surface:#101F36; --surface-2:#16293F; --surface-3:#0D1B2E;
+          --border:#22385A; --border-strong:#2E4A73;
+          --text:#E9F0F9; --muted:#9DB1C7; --faint:#71879E;
+          --navy-soft:#16293F;
+          --green-bg:#0E2E1D; --amber-bg:#33260C; --red-bg:#3A1620;
+          --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 6px 18px rgba(0,0,0,.35); --shadow-lg:0 24px 60px rgba(0,0,0,.5);
+        }
+      }
+      *{box-sizing:border-box;}
+      html,body{margin:0;padding:0;}
+      body{
+        font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+        background:var(--bg); color:var(--text); font-size:14.5px; line-height:1.5;
+        -webkit-font-smoothing:antialiased;
+      }
+      button{font-family:inherit; cursor:pointer;}
+      input,select,textarea{font-family:inherit; font-size:14px; color:var(--text);}
+      h1,h2,h3,h4{margin:0; line-height:1.25;}
+      p{margin:0;}
+      .ic{width:18px;height:18px;flex:none;display:inline-block;vertical-align:middle;}
+      .ic svg{width:100%;height:100%;display:block;}
+
+      /* ---------- Demo banner + top switcher bar ---------- */
+      .demo-banner{
+        background:var(--navy); color:#DCE9FB; text-align:center;
+        font-size:12.5px; font-weight:500; letter-spacing:.01em; padding:7px 16px;
+      }
+      .demo-banner b{color:#fff; font-weight:700;}
+      .topbar{
+        position:sticky; top:0; z-index:60; background:var(--surface);
+        border-bottom:1px solid var(--border);
+        display:flex; align-items:center; gap:16px; padding:10px 20px; flex-wrap:wrap;
+      }
+      .brand{display:flex; align-items:center; gap:10px; min-width:0;}
+      .brand-mark{
+        width:34px;height:34px;border-radius:9px;background:var(--navy);color:#fff;
+        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex:none;
+      }
+      .brand-name{font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--text);white-space:nowrap;}
+      .brand-sub{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+      .seg{margin-left:auto; display:flex; background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:3px; gap:3px;}
+      .seg button{
+        border:0; background:transparent; color:var(--muted); font-weight:600; font-size:13.5px;
+        padding:8px 16px; border-radius:8px; display:flex; align-items:center; gap:7px; transition:all .15s;
+      }
+      .seg button.active{background:var(--navy); color:#fff; box-shadow:var(--shadow-sm);}
+      .biz-chip{
+        display:flex;align-items:center;gap:8px;background:var(--navy-soft);border:1px solid var(--border);
+        color:var(--text); font-weight:600; font-size:13px; padding:7px 12px; border-radius:999px; white-space:nowrap;
+      }
+      .biz-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+
+      /* ---------- Manager layout ---------- */
+      .layout{display:grid; grid-template-columns:236px minmax(0,1fr); max-width:1480px; margin:0 auto; align-items:start;}
+      .sidebar{
+        background:var(--navy); color:#C9D9EE; position:sticky; top:57px; height:calc(100vh - 57px);
+        padding:20px 14px; display:flex; flex-direction:column; gap:4px; overflow-y:auto;
+      }
+      .side-label{font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#7E97B5; padding:10px 10px 6px;}
+      .nav-item{
+        display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+        background:transparent; border:0; color:#C9D9EE; font-size:14px; font-weight:500;
+        padding:10px 12px; border-radius:10px; transition:background .15s,color .15s;
+      }
+      .nav-item:hover{background:rgba(255,255,255,.07); color:#fff;}
+      .nav-item.active{background:#fff; color:var(--navy); font-weight:700;}
+      .nav-badge{margin-left:auto; background:var(--amber-dot); color:#231300; font-size:11px; font-weight:800; min-width:20px; height:20px; border-radius:999px; display:flex; align-items:center; justify-content:center; padding:0 6px;}
+      .nav-item.active .nav-badge{background:var(--amber-dot);}
+      .side-user{margin-top:auto; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:12px; display:flex; gap:10px; align-items:center;}
+      .side-user .nm{color:#fff; font-weight:700; font-size:13.5px;}
+      .side-user .rl{color:#9DB4CF; font-size:12px;}
+      .main{padding:26px 28px 60px; min-width:0;}
+      .page{display:none;}
+      .page.active{display:block;}
+      .page-head{display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:20px;}
+      .page-head h1{font-size:24px; font-weight:800; letter-spacing:-.02em;}
+      .page-head .sub{color:var(--muted); font-size:13.5px; margin-top:3px;}
+      .page-head .spacer{flex:1;}
+
+      /* ---------- Generic components ---------- */
+      .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:20px;}
+      .card h3{font-size:15px; font-weight:700;}
+      .card .card-sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+      .btn{
+        display:inline-flex; align-items:center; gap:7px; border:1px solid var(--navy); background:var(--navy); color:#fff;
+        font-weight:600; font-size:13.5px; padding:9px 16px; border-radius:10px; transition:filter .15s, background .15s;
+      }
+      .btn:hover{filter:brightness(1.12);}
+      .btn-ghost{background:var(--surface); color:var(--text); border:1px solid var(--border-strong);}
+      .btn-ghost:hover{background:var(--surface-2); filter:none;}
+      .btn-soft{background:var(--navy-soft); color:var(--navy); border:1px solid var(--border);}
+      @media (prefers-color-scheme: dark){ .btn-soft{color:#BBD3F5;} }
+      .btn-green{background:var(--green); border-color:var(--green); color:#fff;}
+      .btn-danger{background:var(--surface); color:var(--red); border:1px solid #F0B9B9;}
+      .btn-danger:hover{background:var(--red-bg); filter:none;}
+      .btn-sm{padding:6px 12px; font-size:12.5px; border-radius:8px;}
+      .btn:disabled{opacity:.45; cursor:not-allowed;}
+      .badge{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap;}
+      .badge::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor;}
+      .badge.no-dot::before{display:none;}
+      .badge .ic{width:13px;height:13px;}
+      .b-green{background:var(--green-bg); color:var(--green-dark);}
+      @media (prefers-color-scheme: dark){ .b-green{color:#4ADE80;} }
+      .b-amber{background:var(--amber-bg); color:var(--amber);}
+      @media (prefers-color-scheme: dark){ .b-amber{color:#FBBF24;} }
+      .b-red{background:var(--red-bg); color:var(--red);}
+      @media (prefers-color-scheme: dark){ .b-red{color:#F87171;} }
+      .b-blue{background:var(--navy-soft); color:var(--blue-dark);}
+      @media (prefers-color-scheme: dark){ .b-blue{color:#93B8F8;} }
+      .b-grey{background:var(--surface-2); color:var(--muted);}
+      .avatar{border-radius:50%; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; letter-spacing:.01em;}
+      .demo-tag{font-size:10.5px; font-weight:800; letter-spacing:.07em; color:var(--amber); background:var(--amber-bg); border:1px dashed var(--amber-dot); padding:2px 7px; border-radius:6px; white-space:nowrap;}
+      .input, select.input, textarea.input{
+        width:100%; background:var(--surface); border:1px solid var(--border-strong); border-radius:10px;
+        padding:9px 12px; outline:none; transition:border-color .15s, box-shadow .15s;
+      }
+      .input:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(47,111,237,.18);}
+      .input.invalid{border-color:var(--red); box-shadow:0 0 0 3px rgba(220,38,38,.12);}
+      .field{margin-bottom:14px;}
+      .field label{display:block; font-size:12.5px; font-weight:600; margin-bottom:5px;}
+      .field .err{display:none; color:var(--red); font-size:12px; margin-top:4px; font-weight:500;}
+      .field.has-err .err{display:block;}
+      .search-wrap{position:relative;}
+      .search-wrap .ic{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--faint); width:16px; height:16px;}
+      .search-wrap .input{padding-left:34px;}
+      .empty{
+        text-align:center; padding:44px 20px; color:var(--muted);
+      }
+      .empty .e-ic{width:52px;height:52px;border-radius:14px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--faint);}
+      .empty .e-ic .ic{width:24px;height:24px;}
+      .empty h4{font-size:15px; color:var(--text); margin-bottom:4px;}
+
+      /* ---------- KPI cards ---------- */
+      .kpi-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:16px;}
+      .kpi{display:flex; gap:14px; align-items:flex-start;}
+      .kpi .k-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;}
+      .kpi .k-ic .ic{width:21px;height:21px;}
+      .kpi .k-num{font-size:27px; font-weight:800; letter-spacing:-.02em; line-height:1.1;}
+      .kpi .k-lab{color:var(--muted); font-size:12.5px; font-weight:600;}
+      .kpi .k-delta{font-size:12px; margin-top:3px; color:var(--muted);}
+      .grid-2{display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); gap:16px; margin-bottom:16px;}
+      .grid-2b{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.65fr); gap:16px; margin-bottom:16px;}
+
+      /* coverage bars */
+      .cov-week{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; margin-top:14px;}
+      .cov-day{background:var(--surface-3); border:1px solid var(--border); border-radius:11px; padding:11px 10px; text-align:center;}
+      .cov-day .d-name{font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em;}
+      .cov-day .d-date{font-size:16px; font-weight:800; margin:1px 0 8px;}
+      .cov-track{height:7px; border-radius:99px; background:var(--border); overflow:hidden;}
+      .cov-fill{height:100%; border-radius:99px; background:var(--green);}
+      .cov-fill.low{background:var(--amber-dot);}
+      .cov-day .d-pct{font-size:13px; font-weight:800; margin-top:7px;}
+      .cov-day .d-sub{font-size:11px; color:var(--muted);}
+      .cov-day.today{border-color:var(--blue); box-shadow:0 0 0 2px rgba(47,111,237,.18);}
+      .cov-day.under{border-color:var(--amber-dot); background:var(--amber-bg);}
+
+      /* activity feed */
+      .activity{display:flex; flex-direction:column;}
+      .act-row{display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border);}
+      .act-row:last-child{border-bottom:0; padding-bottom:2px;}
+      .act-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+      .act-ic .ic{width:16px;height:16px;}
+      .act-row .a-txt{font-size:13.5px;}
+      .act-row .a-time{font-size:12px; color:var(--faint);}
+
+      /* quick actions */
+      .qa-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px;}
+      .qa{
+        display:flex; align-items:center; gap:11px; text-align:left; background:var(--surface-3);
+        border:1px solid var(--border); border-radius:12px; padding:13px 14px; transition:border-color .15s, background .15s; width:100%;
+      }
+      .qa:hover{border-color:var(--blue); background:var(--navy-soft);}
+      .qa .q-ic{width:36px;height:36px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;}
+      .qa .q-t{font-weight:700; font-size:13.5px; color:var(--text);}
+      .qa .q-s{font-size:12px; color:var(--muted);}
+
+      /* ---------- Staff directory ---------- */
+      .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;}
+      .toolbar .search-wrap{flex:1 1 240px;}
+      .toolbar select.input{width:auto; flex:0 1 190px;}
+      .dir-list{display:flex; flex-direction:column; gap:9px;}
+      .dir-row{
+        display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1.1fr) minmax(0,1.4fr) auto auto; gap:14px; align-items:center;
+        background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 16px; cursor:pointer;
+        transition:border-color .15s, box-shadow .15s; text-align:left; width:100%; color:var(--text);
+      }
+      .dir-row:hover{border-color:var(--blue); box-shadow:var(--shadow-md);}
+      .dir-who{display:flex; gap:12px; align-items:center; min-width:0;}
+      .dir-who .nm{font-weight:700; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .dir-who .rl{font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .dir-cell{font-size:13px; min-width:0;}
+      .dir-cell .c-lab{display:block; font-size:11px; color:var(--faint); font-weight:700; text-transform:uppercase; letter-spacing:.05em;}
+      .dir-cell .c-val{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .dir-rate{font-weight:800; font-size:14.5px; text-align:right;}
+      .dir-rate span{display:block; font-size:11px; color:var(--faint); font-weight:600;}
+
+      /* profile */
+      .back-link{background:none;border:0;color:var(--blue);font-weight:600;font-size:13.5px;display:inline-flex;gap:6px;align-items:center;padding:0;margin-bottom:14px;}
+      .profile-head{display:flex; gap:18px; align-items:center; flex-wrap:wrap;}
+      .kv{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 20px; margin-top:6px;}
+      .kv .k{font-size:11.5px; color:var(--faint); font-weight:700; text-transform:uppercase; letter-spacing:.05em;}
+      .kv .v{font-size:14px; font-weight:600; margin-top:1px; word-break:break-word;}
+      .mini-row{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13.5px; align-items:center;}
+      .mini-row:last-child{border-bottom:0;}
+      .balance-track{height:10px; border-radius:99px; background:var(--border); overflow:hidden; margin:10px 0 6px;}
+      .balance-fill{height:100%; background:var(--green); border-radius:99px;}
+
+      /* ---------- Schedule ---------- */
+      .week-nav{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+      .week-nav .w-lab{font-weight:800; font-size:15px;}
+      .icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border-strong);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;color:var(--text);}
+      .icon-btn:hover{background:var(--surface-2);}
+      .open-strip{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+      .open-chip{
+        display:flex; align-items:center; gap:10px; border:1.5px dashed var(--amber-dot); background:var(--amber-bg);
+        border-radius:12px; padding:9px 12px; font-size:13px;
+      }
+      .open-chip b{font-weight:700;}
+      .sched-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; align-items:start;}
+      .sched-day{background:var(--surface-3); border:1px solid var(--border); border-radius:13px; padding:10px; min-height:120px;}
+      .sched-day.today{border-color:var(--blue); box-shadow:0 0 0 2px rgba(47,111,237,.15);}
+      .sched-day .sd-head{margin-bottom:9px;}
+      .sched-day .sd-name{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
+      .sched-day .sd-date{font-size:17px; font-weight:800;}
+      .sched-day .sd-cov{font-size:11px; color:var(--muted); margin-top:2px;}
+      .shift-card{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:9px 10px; margin-bottom:8px; box-shadow:var(--shadow-sm);}
+      .shift-card .sc-top{display:flex; align-items:center; gap:7px; min-width:0;}
+      .shift-card .sc-name{font-weight:700; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .shift-card .sc-time{font-size:12px; color:var(--muted); margin-top:3px; font-variant-numeric:tabular-nums;}
+      .shift-card .sc-role{font-size:11.5px; color:var(--muted);}
+      .shift-card.conflict{border-color:var(--red); background:var(--red-bg);}
+      .conflict-note{display:flex; gap:5px; align-items:flex-start; color:var(--red); font-size:11px; font-weight:600; margin-top:5px;}
+      .conflict-note .ic{width:12px;height:12px;margin-top:1px;}
+      .shift-card.open-card{border:1.5px dashed var(--border-strong); background:transparent; box-shadow:none; text-align:center; color:var(--muted); font-size:12px; font-weight:600; padding:12px 8px;}
+      .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:12px;}
+      .legend span{display:inline-flex; align-items:center; gap:6px;}
+      .legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+      /* ---------- Leave ---------- */
+      .chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+      .chip{border:1px solid var(--border-strong); background:var(--surface); color:var(--muted); font-weight:600; font-size:13px; padding:7px 14px; border-radius:999px;}
+      .chip.active{background:var(--navy); border-color:var(--navy); color:#fff;}
+      .req-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:16px 18px; margin-bottom:11px;}
+      .req-top{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+      .req-top .nm{font-weight:700; font-size:15px;}
+      .req-meta{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-size:13px;}
+      .req-meta .m-lab{font-size:11px; color:var(--faint); font-weight:700; text-transform:uppercase; letter-spacing:.05em; display:block;}
+      .req-reason{margin-top:9px; font-size:13.5px; color:var(--muted); background:var(--surface-3); border:1px solid var(--border); border-radius:9px; padding:9px 12px;}
+      .req-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+      .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+      .cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px;}
+      .cal-dow{font-size:11px; font-weight:800; color:var(--faint); text-transform:uppercase; letter-spacing:.05em; text-align:center; padding:4px 0;}
+      .cal-cell{min-height:76px; border:1px solid var(--border); border-radius:9px; padding:5px; background:var(--surface); overflow:hidden;}
+      .cal-cell.blank{background:transparent; border-color:transparent;}
+      .cal-cell.today{border-color:var(--blue); box-shadow:0 0 0 2px rgba(47,111,237,.16);}
+      .cal-cell .cd{font-size:11.5px; font-weight:700; color:var(--muted);}
+      .cal-pill{font-size:10px; font-weight:700; border-radius:5px; padding:1.5px 5px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .cal-pill.approved{background:var(--green-bg); color:var(--green-dark);}
+      @media (prefers-color-scheme: dark){ .cal-pill.approved{color:#4ADE80;} }
+      .cal-pill.pending{background:var(--amber-bg); color:var(--amber);}
+      .cal-more{font-size:10px; color:var(--faint); margin-top:2px;}
+      .bal-row{display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid var(--border);}
+      .bal-row:last-child{border-bottom:0;}
+      .bal-row .b-nm{font-weight:600; font-size:13.5px;}
+      .bal-row .b-nums{margin-left:auto; text-align:right; font-size:12.5px; color:var(--muted); white-space:nowrap;}
+      .bal-row .b-nums b{color:var(--text); font-size:13.5px;}
+
+      /* ---------- Payroll ---------- */
+      .pay-head,.pay-row{display:grid; grid-template-columns:minmax(0,1.7fr) .7fr .8fr .8fr .8fr .9fr; gap:12px; align-items:center; padding:11px 6px;}
+      .pay-head{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); border-bottom:1px solid var(--border);}
+      .pay-row{border-bottom:1px solid var(--border); font-size:13.5px;}
+      .pay-row:last-child{border-bottom:0;}
+      .pay-row .num{text-align:right; font-variant-numeric:tabular-nums;}
+      .pay-head .num{text-align:right;}
+      .pay-row.total{font-weight:800; background:var(--surface-3); border-radius:10px; border-bottom:0; margin-top:6px;}
+      .pay-who{display:flex; gap:10px; align-items:center; min-width:0;}
+      .pay-who .nm{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .pay-who .dp{font-size:11.5px; color:var(--faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+      /* ---------- Settings ---------- */
+      .role-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px;}
+      .cap-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:13.5px;}
+      .cap-row:last-child{border-bottom:0;}
+      .toggle{width:40px; height:23px; border-radius:99px; background:var(--border-strong); border:0; position:relative; flex:none; transition:background .15s; padding:0;}
+      .toggle::after{content:""; position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:#fff; box-shadow:var(--shadow-sm); transition:left .15s;}
+      .toggle[aria-checked="true"]{background:var(--green);}
+      .toggle[aria-checked="true"]::after{left:20px;}
+      .set-row{display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border);}
+      .set-row:last-child{border-bottom:0;}
+      .set-row .s-nm{font-weight:600; font-size:14px;}
+      .set-row .s-sub{font-size:12.5px; color:var(--muted);}
+      .set-row .s-right{margin-left:auto; text-align:right;}
+      .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 14px;}
+
+      /* ---------- Modals & toasts ---------- */
+      .overlay{position:fixed; inset:0; background:rgba(7,22,40,.55); z-index:100; display:none; align-items:center; justify-content:center; padding:18px;}
+      .overlay.open{display:flex;}
+      .modal{background:var(--surface); border-radius:18px; box-shadow:var(--shadow-lg); width:100%; max-width:520px; max-height:92vh; overflow-y:auto; padding:24px;}
+      .modal.wide{max-width:760px;}
+      .modal h2{font-size:18px; font-weight:800; letter-spacing:-.01em;}
+      .modal .m-sub{color:var(--muted); font-size:13px; margin:4px 0 16px;}
+      .modal-actions{display:flex; gap:9px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; position:sticky; bottom:-24px; background:var(--surface); padding:12px 0 0; z-index:2;}
+      #toasts{position:fixed; right:18px; bottom:18px; z-index:200; display:flex; flex-direction:column; gap:9px; max-width:min(360px, calc(100vw - 36px));}
+      .toast{
+        background:var(--navy); color:#fff; border-radius:12px; padding:12px 15px; box-shadow:var(--shadow-lg);
+        display:flex; gap:10px; align-items:flex-start; font-size:13.5px; animation:tin .25s ease;
+      }
+      .toast .t-ic{color:#4ADE80; margin-top:1px;}
+      .toast.warn .t-ic{color:#FBBF24;}
+      @keyframes tin{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+      @media (prefers-reduced-motion: reduce){ .toast{animation:none;} *{transition:none !important;} }
+
+      /* ---------- Mobile app / phone frame ---------- */
+      .mobile-wrap{display:none; padding:30px 16px 50px;}
+      .mobile-wrap.active{display:block;}
+      .manager-wrap{display:block;}
+      .manager-wrap.hidden{display:none;}
+      .phone{
+        width:392px; max-width:100%; margin:0 auto; background:var(--surface);
+        border:3px solid var(--navy); border-radius:44px; box-shadow:var(--shadow-lg);
+        overflow:hidden; position:relative; height:min(800px, calc(100vh - 190px)); min-height:560px;
+        display:flex; flex-direction:column;
+      }
+      .phone-notch{position:absolute; top:9px; left:50%; transform:translateX(-50%); width:110px; height:22px; background:var(--navy); border-radius:99px; z-index:5;}
+      .phone-status{display:flex; justify-content:space-between; padding:12px 24px 4px; font-size:12px; font-weight:700; color:var(--text);}
+      .phone-scroll{flex:1; overflow-y:auto; padding:6px 18px 92px; position:relative;}
+      .m-screen{display:none;}
+      .m-screen.active{display:block;}
+      .m-bottomnav{
+        position:absolute; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--border);
+        display:grid; grid-template-columns:repeat(5,1fr); padding:8px 6px calc(10px + env(safe-area-inset-bottom)); z-index:6;
+      }
+      .m-nav-btn{background:none; border:0; color:var(--faint); font-size:10.5px; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 2px; border-radius:9px; position:relative;}
+      .m-nav-btn .ic{width:21px;height:21px;}
+      .m-nav-btn.active{color:var(--navy);}
+      @media (prefers-color-scheme: dark){ .m-nav-btn.active{color:#BBD3F5;} }
+      .m-nav-dot{position:absolute; top:2px; right:calc(50% - 17px); width:8px; height:8px; border-radius:50%; background:var(--red); display:none;}
+      .m-greet{font-size:21px; font-weight:800; letter-spacing:-.02em;}
+      .m-card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:var(--shadow-sm); margin-bottom:12px;}
+      .m-card.navy{background:var(--navy); color:#fff; border-color:var(--navy);}
+      .m-card.navy .muted{color:#A9C2DE;}
+      .m-sec-title{font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:18px 0 9px;}
+      .m-shift-row{display:flex; gap:12px; align-items:center; width:100%; text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:9px; color:var(--text); box-shadow:var(--shadow-sm);}
+      .m-shift-row .d-box{width:46px; height:50px; border-radius:11px; background:var(--navy-soft); display:flex; flex-direction:column; align-items:center; justify-content:center; flex:none;}
+      .m-shift-row .d-box .dw{font-size:10px; font-weight:800; color:var(--blue-dark); text-transform:uppercase;}
+      @media (prefers-color-scheme: dark){ .m-shift-row .d-box .dw{color:#93B8F8;} }
+      .m-shift-row .d-box .dn{font-size:16px; font-weight:800; line-height:1.1;}
+      .m-qa{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+      .m-qa button{border-radius:14px; padding:14px 12px; font-weight:700; font-size:13.5px; display:flex; flex-direction:column; gap:7px; align-items:flex-start; border:1px solid var(--border);}
+      .m-notif{display:flex; gap:11px; padding:12px 0; border-bottom:1px solid var(--border);}
+      .m-notif:last-child{border-bottom:0;}
+      .m-notif .n-ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;}
+      .m-notif .n-t{font-weight:700; font-size:13.5px;}
+      .m-notif .n-b{font-size:12.5px; color:var(--muted);}
+      .m-notif .n-time{font-size:11px; color:var(--faint); margin-left:auto; white-space:nowrap;}
+      .m-notif.unread .n-t::after{content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--blue); margin-left:6px; vertical-align:2px;}
+      .bell-btn{position:relative; width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--text);}
+      .bell-btn .bdot{position:absolute; top:8px; right:9px; width:8px; height:8px; border-radius:50%; background:var(--red); display:none;}
+      .m-list-row{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:13px 14px; margin-bottom:9px; color:var(--text); font-size:14px; font-weight:600;}
+      .pay-line{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13.5px;}
+      .pay-line:last-child{border-bottom:0;}
+      .pay-line .pl-v{font-weight:700; font-variant-numeric:tabular-nums;}
+
+      /* ---------- Responsive ---------- */
+      @media (max-width:1180px){
+        .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .sched-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+        .role-grid{grid-template-columns:1fr;}
+      }
+      @media (max-width:960px){
+        .layout{grid-template-columns:1fr;}
+        .sidebar{position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; padding:10px 12px; border-radius:0;}
+        .side-label{display:none;}
+        .nav-item{width:auto; padding:8px 11px;}
+        .nav-badge{margin-left:4px;}
+        .side-user{display:none;}
+        .main{padding:20px 16px 50px;}
+        .grid-2,.grid-2b{grid-template-columns:1fr;}
+        .dir-row{grid-template-columns:minmax(0,1fr) auto; grid-row-gap:6px;}
+        .dir-row .dir-cell.hide-m{display:none;}
+      }
+      @media (max-width:700px){
+        .sched-grid{grid-template-columns:minmax(0,1fr);}
+        .cov-week{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .qa-grid{grid-template-columns:1fr;}
+        .kpi-grid{grid-template-columns:1fr;}
+        .cal-cell{min-height:56px;}
+        .cal-pill{font-size:9px;}
+        .pay-head{display:none;}
+        .pay-row{grid-template-columns:minmax(0,1fr) auto; row-gap:2px;}
+        .pay-row .num{text-align:right;}
+        .pay-row .pay-opt{display:none;}
+        .pay-row .num:empty{display:none;}
+        .form-grid{grid-template-columns:1fr;}
+        .seg button{padding:8px 11px; font-size:12.5px;}
+        .biz-chip{display:none;}
+        .phone{height:calc(100vh - 170px); border-radius:34px;}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-banner"><b>StaffFlow</b> — UI concept &middot; Demo data only &middot; No real payroll, login or database connected</div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">S</div>
+        <div>
+          <div class="brand-name">StaffFlow</div>
+          <div class="brand-sub">Workforce management</div>
+        </div>
+      </div>
+      <div class="biz-chip"><span class="dot"></span> Harbour &amp; Grey Ltd</div>
+      <div class="seg" role="tablist" aria-label="Experience switcher">
+        <button id="seg-manager" class="active" onclick="switchExperience('manager')">
+          <span class="ic" data-icon="monitor"></span> Manager Dashboard
+        </button>
+        <button id="seg-mobile" onclick="switchExperience('mobile')">
+          <span class="ic" data-icon="phone"></span> Employee App
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= MANAGER DASHBOARD ================= -->
+    <div class="manager-wrap" id="manager-wrap">
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="side-label">Manage</div>
+          <button class="nav-item active" data-nav="dashboard" onclick="showPage('dashboard')"><span class="ic" data-icon="grid"></span> Dashboard</button>
+          <button class="nav-item" data-nav="staff" onclick="showPage('staff')"><span class="ic" data-icon="users"></span> Staff</button>
+          <button class="nav-item" data-nav="schedule" onclick="showPage('schedule')"><span class="ic" data-icon="calendar"></span> Schedule</button>
+          <button class="nav-item" data-nav="leave" onclick="showPage('leave')"><span class="ic" data-icon="plane"></span> Leave &amp; Absence <span class="nav-badge" id="nav-pending-badge">3</span></button>
+          <button class="nav-item" data-nav="payroll" onclick="showPage('payroll')"><span class="ic" data-icon="pound"></span> Payroll</button>
+          <div class="side-label">Configure</div>
+          <button class="nav-item" data-nav="settings" onclick="showPage('settings')"><span class="ic" data-icon="settings"></span> Settings</button>
+          <div class="side-user">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;background:#2F6FED;">OG</div>
+            <div>
+              <div class="nm">Oliver Grant</div>
+              <div class="rl">Admin &middot; Store Manager</div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <!-- ======= DASHBOARD ======= -->
+          <section class="page active" id="page-dashboard">
+            <div class="page-head">
+              <div>
+                <h1>Good morning, Oliver</h1>
+                <p class="sub">Wednesday 21 October 2026 &middot; Harbour &amp; Grey Ltd &middot; Here's what's happening across your team today.</p>
+              </div>
+              <div class="spacer"></div>
+              <button class="btn btn-ghost" onclick="quickReview()"><span class="ic" data-icon="check"></span> Review requests</button>
+              <button class="btn" onclick="openAddEmployee()"><span class="ic" data-icon="plus"></span> Add staff</button>
+            </div>
+
+            <div class="kpi-grid" id="kpi-grid"></div>
+
+            <div class="grid-2">
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+                  <div>
+                    <h3>Weekly staffing overview</h3>
+                    <p class="card-sub">Scheduled vs required cover &middot; Mon 19 – Sun 25 Oct 2026</p>
+                  </div>
+                  <button class="btn btn-soft btn-sm" onclick="showPage('schedule')">Open schedule</button>
+                </div>
+                <div class="cov-week" id="cov-week"></div>
+                <p style="font-size:12.5px;color:var(--muted);margin-top:12px;" id="cov-note"></p>
+              </div>
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                  <div>
+                    <h3>Payroll summary</h3>
+                    <p class="card-sub">Current pay period &middot; 1–31 Oct 2026</p>
+                  </div>
+                  <span class="demo-tag">DEMO DATA</span>
+                </div>
+                <div id="dash-payroll" style="margin-top:14px;"></div>
+                <button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="showPage('payroll')">View payroll <span class="ic" data-icon="arrow"></span></button>
+              </div>
+            </div>
+
+            <div class="grid-2b">
+              <div class="card">
+                <h3>Quick actions</h3>
+                <p class="card-sub">Common tasks, one click away</p>
+                <div class="qa-grid" style="grid-template-columns:1fr;">
+                  <button class="qa" onclick="openAddEmployee()">
+                    <span class="q-ic"><span class="ic" data-icon="userplus"></span></span>
+                    <span><span class="q-t">Add staff member</span><br /><span class="q-s">Create a new employee record</span></span>
+                  </button>
+                  <button class="qa" onclick="quickCreateShift()">
+                    <span class="q-ic"><span class="ic" data-icon="calendarplus"></span></span>
+                    <span><span class="q-t">Create shift</span><br /><span class="q-s">Add a shift to this week's rota</span></span>
+                  </button>
+                  <button class="qa" onclick="quickReview()">
+                    <span class="q-ic"><span class="ic" data-icon="inbox"></span></span>
+                    <span><span class="q-t">Review requests</span><br /><span class="q-s" id="qa-pending-sub">3 requests waiting for a decision</span></span>
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Recent activity</h3>
+                <p class="card-sub">Latest updates from across the business</p>
+                <div class="activity" id="activity-feed" style="margin-top:8px;"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ======= STAFF ======= -->
+          <section class="page" id="page-staff">
+            <div class="page-head">
+              <div>
+                <h1>Staff database</h1>
+                <p class="sub" id="staff-count-sub">12 employees across 5 departments</p>
+              </div>
+              <div class="spacer"></div>
+              <button class="btn" onclick="openAddEmployee()"><span class="ic" data-icon="plus"></span> Add employee</button>
+            </div>
+            <div class="toolbar">
+              <div class="search-wrap">
+                <span class="ic" data-icon="search"></span>
+                <input class="input" id="staff-search" type="text" placeholder="Search by name, role or email…" oninput="renderDirectory()" />
+              </div>
+              <select class="input" id="staff-dept" onchange="renderDirectory()">
+                <option value="">All departments</option>
+              </select>
+              <select class="input" id="staff-status" onchange="renderDirectory()">
+                <option value="">All statuses</option>
+                <option>Active</option>
+                <option>On leave</option>
+                <option>Part-time</option>
+              </select>
+            </div>
+            <div class="dir-list" id="dir-list"></div>
+          </section>
+
+          <!-- ======= EMPLOYEE PROFILE ======= -->
+          <section class="page" id="page-profile">
+            <button class="back-link" onclick="showPage('staff')"><span class="ic" data-icon="back"></span> Back to staff directory</button>
+            <div id="profile-content"></div>
+          </section>
+
+          <!-- ======= SCHEDULE ======= -->
+          <section class="page" id="page-schedule">
+            <div class="page-head">
+              <div>
+                <h1>Schedule</h1>
+                <p class="sub">Weekly rota &middot; drag-free, tap a day to review cover</p>
+              </div>
+              <div class="spacer"></div>
+              <div class="week-nav">
+                <button class="icon-btn" onclick="changeWeek(-1)" aria-label="Previous week"><span class="ic" data-icon="chevL"></span></button>
+                <span class="w-lab" id="week-label">19 – 25 Oct 2026</span>
+                <button class="icon-btn" onclick="changeWeek(1)" aria-label="Next week"><span class="ic" data-icon="chevR"></span></button>
+                <button class="btn btn-ghost btn-sm" onclick="resetWeek()">This week</button>
+                <button class="btn" onclick="openAddShift()"><span class="ic" data-icon="plus"></span> Add shift</button>
+              </div>
+            </div>
+            <div id="open-strip-wrap"></div>
+            <div class="sched-grid" id="sched-grid"></div>
+            <div class="legend">
+              <span><span class="sw" style="background:var(--green);"></span> Confirmed</span>
+              <span><span class="sw" style="background:var(--amber-dot);"></span> Pending swap / understaffed</span>
+              <span><span class="sw" style="background:var(--red);"></span> Overlap conflict</span>
+              <span><span class="sw" style="border:1.5px dashed var(--border-strong);"></span> Open / unassigned shift</span>
+            </div>
+          </section>
+
+          <!-- ======= LEAVE & ABSENCE ======= -->
+          <section class="page" id="page-leave">
+            <div class="page-head">
+              <div>
+                <h1>Leave &amp; absence</h1>
+                <p class="sub">Review annual leave and sick absence requests, track balances and see who's away.</p>
+              </div>
+              <div class="spacer"></div>
+              <span class="demo-tag">DEMO DATA</span>
+            </div>
+            <div class="chips" id="leave-chips">
+              <button class="chip active" data-filter="All" onclick="setLeaveFilter('All')">All requests</button>
+              <button class="chip" data-filter="Pending" onclick="setLeaveFilter('Pending')">Pending <span id="chip-pending-count"></span></button>
+              <button class="chip" data-filter="Approved" onclick="setLeaveFilter('Approved')">Approved</button>
+              <button class="chip" data-filter="Declined" onclick="setLeaveFilter('Declined')">Declined</button>
+            </div>
+            <div class="grid-2" style="grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);">
+              <div id="leave-list"></div>
+              <div>
+                <div class="card" style="margin-bottom:16px;">
+                  <h3>Leave balances</h3>
+                  <p class="card-sub">Annual allowance: 28 days per employee</p>
+                  <div id="balance-list" style="margin-top:6px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="cal-head">
+                <div>
+                  <h3>Absence calendar</h3>
+                  <p class="card-sub">Approved (green) and pending (amber) absences</p>
+                </div>
+                <div class="week-nav">
+                  <button class="icon-btn" onclick="changeCalMonth(-1)" aria-label="Previous month"><span class="ic" data-icon="chevL"></span></button>
+                  <span class="w-lab" id="cal-label">October 2026</span>
+                  <button class="icon-btn" onclick="changeCalMonth(1)" aria-label="Next month"><span class="ic" data-icon="chevR"></span></button>
+                </div>
+              </div>
+              <div class="cal-grid" id="cal-dow"></div>
+              <div class="cal-grid" id="cal-grid"></div>
+            </div>
+          </section>
+
+          <!-- ======= PAYROLL ======= -->
+          <section class="page" id="page-payroll">
+            <div class="page-head">
+              <div>
+                <h1>Payroll</h1>
+                <p class="sub">Hours, overtime and estimated pay for the selected period.</p>
+              </div>
+              <div class="spacer"></div>
+              <span class="demo-tag">DEMO DATA — NOT REAL PAYROLL</span>
+              <select class="input" id="pay-period" style="width:auto;" onchange="renderPayroll()">
+                <option value="2026-10">October 2026 (current)</option>
+                <option value="2026-09">September 2026</option>
+              </select>
+              <button class="btn" onclick="openReport()"><span class="ic" data-icon="file"></span> Generate report</button>
+            </div>
+            <div class="kpi-grid" id="pay-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr));"></div>
+            <div class="card">
+              <h3>Employee pay breakdown</h3>
+              <p class="card-sub">Overtime is paid at 1.5&times; the hourly rate. All figures are sample demonstration data.</p>
+              <div style="margin-top:10px;">
+                <div class="pay-head"><div>Employee</div><div class="num">Hourly rate</div><div class="num">Regular hrs</div><div class="num">Overtime hrs</div><div class="num">OT rate</div><div class="num">Gross estimate</div></div>
+                <div id="pay-rows"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ======= SETTINGS ======= -->
+          <section class="page" id="page-settings">
+            <div class="page-head">
+              <div>
+                <h1>Settings</h1>
+                <p class="sub">Roles, departments, job roles and working-hour rules for Harbour &amp; Grey Ltd.</p>
+              </div>
+            </div>
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:4px;">Roles &amp; permissions</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Three access levels control who can see and change staff and payroll information. Toggles are illustrative in this concept.</p>
+            <div class="role-grid" id="role-grid" style="margin-bottom:22px;"></div>
+
+            <div class="grid-2">
+              <div class="card">
+                <h3>Departments</h3>
+                <p class="card-sub">Headcounts update live from the staff directory</p>
+                <div id="dept-list" style="margin-top:6px;"></div>
+              </div>
+              <div class="card">
+                <h3>Job roles</h3>
+                <p class="card-sub">Roles currently in use across the business</p>
+                <div id="role-list" style="margin-top:6px;"></div>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="card">
+                <h3>Working hours &amp; pay rules</h3>
+                <p class="card-sub">Applied to scheduling and payroll estimates</p>
+                <div style="margin-top:14px;">
+                  <div class="form-grid">
+                    <div class="field"><label for="set-std-week">Standard week (hours)</label><input class="input" id="set-std-week" type="number" value="40" min="1" max="80" /></div>
+                    <div class="field"><label for="set-ot-threshold">Overtime threshold (hrs / week)</label><input class="input" id="set-ot-threshold" type="number" value="40" min="1" max="80" /></div>
+                    <div class="field"><label for="set-ot-mult">Overtime multiplier</label>
+                      <select class="input" id="set-ot-mult"><option value="1.25">1.25&times;</option><option value="1.5" selected>1.5&times;</option><option value="2">2&times;</option></select>
+                    </div>
+                    <div class="field"><label for="set-pay-period">Pay period</label>
+                      <select class="input" id="set-pay-period"><option selected>Monthly (1st – month end)</option><option>Weekly</option><option>Fortnightly</option></select>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm" onclick="saveSettings()">Save settings</button>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Data security</h3>
+                <p class="card-sub">How staff and payroll information is handled</p>
+                <div style="margin-top:10px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:10px;">
+                  <p>Staff records and payroll figures are restricted by role: employees can only see their own information, managers see their departments, and only Admins can view or export payroll.</p>
+                  <p>All access is logged, data is encrypted in transit and at rest, and records are retained in line with UK GDPR and HMRC guidance in a production deployment.</p>
+                  <p><span class="demo-tag">DEMO NOTE</span> &nbsp;This concept stores nothing — all sample data lives only in this page, in this session.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- ================= EMPLOYEE MOBILE APP ================= -->
+    <div class="mobile-wrap" id="mobile-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-status"><span>09:41</span><span>StaffFlow</span><span>5G &nbsp;▰▰▰</span></div>
+        <div class="phone-scroll" id="phone-scroll">
+
+          <!-- HOME -->
+          <div class="m-screen active" id="m-home">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="flex:1;min-width:0;">
+                <p style="color:var(--muted);font-size:12.5px;font-weight:600;">Wednesday 21 October</p>
+                <h2 class="m-greet">Hi, Amelia</h2>
+              </div>
+              <button class="bell-btn" onclick="mShow('notifs')" aria-label="Notifications">
+                <span class="ic" data-icon="bell"></span><span class="bdot" id="bell-dot"></span>
+              </button>
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:#DB2777;">AH</div>
+            </div>
+            <div id="m-next-shift" style="margin-top:14px;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="m-card" style="margin-bottom:0;">
+                <p style="font-size:12px;color:var(--muted);font-weight:700;">HOURS THIS WEEK</p>
+                <p style="font-size:22px;font-weight:800;margin-top:2px;" id="m-hours-week">38.0</p>
+                <p style="font-size:12px;color:var(--muted);">of 40 contracted</p>
+              </div>
+              <div class="m-card" style="margin-bottom:0;">
+                <p style="font-size:12px;color:var(--muted);font-weight:700;">LEAVE REMAINING</p>
+                <p style="font-size:22px;font-weight:800;margin-top:2px;" id="m-leave-left">19 days</p>
+                <p style="font-size:12px;color:var(--muted);">of 28 days allowance</p>
+              </div>
+            </div>
+            <p class="m-sec-title">Quick actions</p>
+            <div class="m-qa">
+              <button style="background:var(--navy);color:#fff;border-color:var(--navy);" onclick="openNewRequest('Annual Leave')">
+                <span class="ic" data-icon="plane"></span> Request leave
+              </button>
+              <button style="background:var(--surface);color:var(--text);" onclick="openNewRequest('Sick')">
+                <span class="ic" data-icon="thermo" style="color:var(--red);"></span> Report sick
+              </button>
+            </div>
+            <p class="m-sec-title">Notifications</p>
+            <div class="m-card" style="padding:4px 16px;" id="m-notif-preview"></div>
+            <p class="m-sec-title">Coming up</p>
+            <div id="m-upcoming"></div>
+          </div>
+
+          <!-- SCHEDULE -->
+          <div class="m-screen" id="m-schedule">
+            <h2 class="m-greet" style="margin-bottom:4px;">My schedule</h2>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Week of Mon 19 – Sun 25 Oct 2026 &middot; tap a shift for details</p>
+            <div id="m-shift-list"></div>
+          </div>
+
+          <!-- SHIFT DETAIL -->
+          <div class="m-screen" id="m-shift-detail">
+            <button class="back-link" onclick="mShow('schedule')"><span class="ic" data-icon="back"></span> Back to schedule</button>
+            <div id="m-shift-detail-body"></div>
+          </div>
+
+          <!-- REQUESTS -->
+          <div class="m-screen" id="m-requests">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+              <h2 class="m-greet" style="flex:1;">My requests</h2>
+              <button class="btn btn-sm" onclick="openNewRequest('Annual Leave')"><span class="ic" data-icon="plus"></span> New</button>
+            </div>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Annual leave and sick absence you've submitted</p>
+            <div id="m-request-list"></div>
+          </div>
+
+          <!-- NEW REQUEST -->
+          <div class="m-screen" id="m-new-request">
+            <button class="back-link" onclick="mShow('requests')"><span class="ic" data-icon="back"></span> Back to requests</button>
+            <h2 class="m-greet" style="margin-bottom:4px;">New request</h2>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Your manager will be notified straight away.</p>
+            <div id="m-req-success" style="display:none;" class="m-card" >
+              <div style="text-align:center;padding:10px 0;">
+                <div style="width:52px;height:52px;border-radius:50%;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;"><span class="ic" data-icon="check" style="width:26px;height:26px;"></span></div>
+                <h3 style="font-size:16px;">Request submitted</h3>
+                <p style="color:var(--muted);font-size:13px;margin-top:4px;">It's now with your manager for review. You'll get a notification when there's a decision.</p>
+                <button class="btn" style="margin-top:14px;" onclick="mShow('requests')">View my requests</button>
+              </div>
+            </div>
+            <form id="m-req-form" novalidate>
+              <div class="field">
+                <label for="mr-type">Request type</label>
+                <select class="input" id="mr-type">
+                  <option>Annual Leave</option>
+                  <option>Sick</option>
+                </select>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="field"><label for="mr-start">Start date</label><input class="input" id="mr-start" type="date" value="2026-11-16" /><p class="err">Choose a start date.</p></div>
+                <div class="field"><label for="mr-end">End date</label><input class="input" id="mr-end" type="date" value="2026-11-18" /><p class="err">End date must be on or after the start date.</p></div>
+              </div>
+              <div class="field">
+                <label for="mr-reason">Reason</label>
+                <textarea class="input" id="mr-reason" rows="3" placeholder="e.g. Family trip, appointment, feeling unwell…"></textarea>
+                <p class="err">Please add a short reason.</p>
+              </div>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;" id="mr-balance-note"></p>
+              <button type="submit" class="btn" style="width:100%;justify-content:center;padding:12px;">Submit request</button>
+            </form>
+          </div>
+
+          <!-- PAYSLIP -->
+          <div class="m-screen" id="m-payslip">
+            <h2 class="m-greet" style="margin-bottom:4px;">My payslip</h2>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Sample figures for illustration <span class="demo-tag">DEMO DATA</span></p>
+            <div id="m-payslip-body"></div>
+          </div>
+
+          <!-- NOTIFICATIONS -->
+          <div class="m-screen" id="m-notifs">
+            <button class="back-link" onclick="mShow('home')"><span class="ic" data-icon="back"></span> Back</button>
+            <h2 class="m-greet" style="margin-bottom:12px;">Notifications</h2>
+            <div class="m-card" style="padding:4px 16px;" id="m-notif-list"></div>
+          </div>
+
+          <!-- MORE / PROFILE -->
+          <div class="m-screen" id="m-more">
+            <h2 class="m-greet" style="margin-bottom:14px;">My profile</h2>
+            <div id="m-profile-body"></div>
+            <button class="m-list-row" onclick="mShow('notifs')"><span class="ic" data-icon="bell"></span> Notifications <span style="margin-left:auto;color:var(--faint);">›</span></button>
+            <button class="m-list-row" onclick="mShow('payslip')"><span class="ic" data-icon="pound"></span> Payslips <span style="margin-left:auto;color:var(--faint);">›</span></button>
+            <button class="m-list-row" onclick="toast('Demo only — sign-in and account settings are not connected.')"><span class="ic" data-icon="settings"></span> App settings <span style="margin-left:auto;color:var(--faint);">›</span></button>
+          </div>
+        </div>
+
+        <nav class="m-bottomnav">
+          <button class="m-nav-btn active" data-mnav="home" onclick="mShow('home')"><span class="ic" data-icon="home"></span>Home</button>
+          <button class="m-nav-btn" data-mnav="schedule" onclick="mShow('schedule')"><span class="ic" data-icon="calendar"></span>Schedule</button>
+          <button class="m-nav-btn" data-mnav="requests" onclick="mShow('requests')"><span class="ic" data-icon="inbox"></span>Requests<span class="m-nav-dot" id="req-dot"></span></button>
+          <button class="m-nav-btn" data-mnav="payslip" onclick="mShow('payslip')"><span class="ic" data-icon="pound"></span>Payslip</button>
+          <button class="m-nav-btn" data-mnav="more" onclick="mShow('more')"><span class="ic" data-icon="user"></span>More</button>
+        </nav>
+      </div>
+      <p style="text-align:center;color:var(--muted);font-size:12.5px;margin-top:16px;">Employee view &middot; signed in as Amelia Hart, Sales Assistant (Retail) &middot; demo session</p>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+    <!-- Employee add/edit -->
+    <div class="overlay" id="modal-employee">
+      <div class="modal">
+        <h2 id="emp-modal-title">Add employee</h2>
+        <p class="m-sub">The new record appears in the directory, settings headcounts and payroll straight away.</p>
+        <form id="emp-form" novalidate>
+          <input type="hidden" id="ef-id" />
+          <div class="form-grid">
+            <div class="field"><label for="ef-name">Full name *</label><input class="input" id="ef-name" type="text" placeholder="e.g. Charlotte Evans" /><p class="err">Name is required.</p></div>
+            <div class="field"><label for="ef-role">Job role *</label>
+              <select class="input" id="ef-role">
+                <option value="">Select a role…</option>
+                <option>Store Manager</option><option>Shift Supervisor</option><option>Barista</option>
+                <option>Front of House Server</option><option>Chef de Partie</option><option>Kitchen Porter</option>
+                <option>Sales Assistant</option><option>Warehouse Operative</option><option>Warehouse Team Lead</option>
+                <option>Administrator</option><option>Accounts Assistant</option>
+              </select><p class="err">Choose a job role.</p></div>
+            <div class="field"><label for="ef-dept">Department *</label>
+              <select class="input" id="ef-dept">
+                <option value="">Select a department…</option>
+                <option>Front of House</option><option>Kitchen</option><option>Retail</option><option>Warehouse</option><option>Office</option>
+              </select><p class="err">Choose a department.</p></div>
+            <div class="field"><label for="ef-status">Employment status</label>
+              <select class="input" id="ef-status"><option>Active</option><option>Part-time</option><option>On leave</option></select></div>
+            <div class="field"><label for="ef-rate">Hourly rate (£) *</label><input class="input" id="ef-rate" type="number" step="0.05" min="11" max="40" placeholder="12.50" /><p class="err">Enter an hourly rate between £11.00 and £40.00.</p></div>
+            <div class="field"><label for="ef-contracted">Contracted hours / week</label><input class="input" id="ef-contracted" type="number" min="4" max="48" value="40" /></div>
+            <div class="field"><label for="ef-email">Email</label><input class="input" id="ef-email" type="email" placeholder="name@harbourandgrey.co.uk" /><p class="err">That email doesn't look right.</p></div>
+            <div class="field"><label for="ef-phone">Phone</label><input class="input" id="ef-phone" type="tel" placeholder="07700 900000" /></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('modal-employee')">Cancel</button>
+            <button type="submit" class="btn" id="emp-save-btn">Save employee</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add shift -->
+    <div class="overlay" id="modal-shift">
+      <div class="modal">
+        <h2>Add shift</h2>
+        <p class="m-sub">The shift appears in the weekly grid and updates that day's cover immediately.</p>
+        <form id="shift-form" novalidate>
+          <div class="field"><label for="sf-emp">Employee</label><select class="input" id="sf-emp"></select></div>
+          <div class="form-grid">
+            <div class="field"><label for="sf-day">Day</label><select class="input" id="sf-day"></select></div>
+            <div class="field"><label for="sf-role">Role</label><input class="input" id="sf-role" type="text" placeholder="Defaults to employee's role" /></div>
+            <div class="field"><label for="sf-start">Start time</label><input class="input" id="sf-start" type="time" value="09:00" /></div>
+            <div class="field"><label for="sf-end">End time</label><input class="input" id="sf-end" type="time" value="17:00" /><p class="err">End time must be after the start time.</p></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('modal-shift')">Cancel</button>
+            <button type="submit" class="btn">Add shift</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign open shift -->
+    <div class="overlay" id="modal-assign">
+      <div class="modal">
+        <h2>Assign open shift</h2>
+        <p class="m-sub" id="assign-sub">Choose who covers this shift.</p>
+        <div class="field"><label for="as-emp">Employee</label><select class="input" id="as-emp"></select></div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal('modal-assign')">Cancel</button>
+          <button class="btn btn-green" onclick="confirmAssign()">Assign shift</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm dialog -->
+    <div class="overlay" id="modal-confirm">
+      <div class="modal" style="max-width:420px;">
+        <h2 id="confirm-title">Are you sure?</h2>
+        <p class="m-sub" id="confirm-body" style="margin-bottom:0;">This action can't be undone in this demo.</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Keep request</button>
+          <button class="btn" style="background:var(--red);border-color:var(--red);" id="confirm-yes">Yes, decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payroll report -->
+    <div class="overlay" id="modal-report">
+      <div class="modal wide">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h2 id="report-title">Payroll report — October 2026</h2>
+            <p class="m-sub" style="margin-bottom:0;">Harbour &amp; Grey Ltd &middot; generated from StaffFlow demo data</p>
+          </div>
+          <span class="demo-tag">SAMPLE REPORT — DEMONSTRATION DATA ONLY</span>
+        </div>
+        <div id="report-body" style="margin-top:16px;"></div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal('modal-report')">Close</button>
+          <button class="btn" onclick="downloadCSV()"><span class="ic" data-icon="download"></span> Download CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toasts" aria-live="polite"></div>
+
+    <script>
+      /* ================= Icons (inline SVG, stroke style) ================= */
+      const ICON_PATHS = {
+        grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+        users:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M16 5.2a3.5 3.5 0 0 1 0 5.9M18.5 14.9c1.5.8 2.5 2.3 2.5 4.1"/>',
+        user:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.8 3.9-6 7.5-6s6.7 2.2 7.5 6"/>',
+        userplus:'<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.7-3.4 3.3-5.5 6.5-5.5 1.5 0 2.9.5 4 1.4M18.5 8v6M15.5 11h6"/>',
+        calendar:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+        calendarplus:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M12 13v6M9 16h6"/>',
+        plane:'<path d="M10.5 13.5 3 11l1.5-1.5L11 11l3.6-5.4c.7-1 2.2-1.2 3-.4.9.8.9 2 .2 2.9L13.5 14l-1.2 5-1.8 1 .8-5.2z"/><path d="M3 21h7"/>',
+        pound:'<path d="M6 20c2-1.2 3.5-.5 6-.5 2.8 0 4.5-.8 6-2.5M18 7.5c-.6-2-2.2-3-4.5-3C10 4.5 8 6.6 8 9.5c0 1.2.4 2 .8 3H6.5M8.5 15H17"/>',
+        settings:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
+        bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 3h-15z"/><path d="M10 21a2.2 2.2 0 0 0 4 0"/>',
+        search:'<circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.8-4.8"/>',
+        plus:'<path d="M12 5v14M5 12h14"/>',
+        check:'<path d="m4.5 12.5 5 5 10-11"/>',
+        x:'<path d="M6 6l12 12M18 6 6 18"/>',
+        clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+        alert:'<path d="M12 3.5 22 20H2z"/><path d="M12 10v4.5M12 17.4v.1"/>',
+        mail:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+        phone:'<path d="M5 4h4l1.5 4.5L8 10.5a12 12 0 0 0 5.5 5.5l2-2.5L20 15v4a1.6 1.6 0 0 1-1.7 1.6C10 20 4 14 3.4 5.7A1.6 1.6 0 0 1 5 4Z"/>',
+        monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>',
+        file:'<path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19M9 13h6M9 17h6"/>',
+        download:'<path d="M12 4v11M7 11l5 5 5-5M4.5 20.5h15"/>',
+        home:'<path d="m3.5 11 8.5-7.5L20.5 11M5.5 9.5V21h13V9.5"/>',
+        inbox:'<path d="M3.5 13.5 5.5 4h13l2 9.5V19a1.6 1.6 0 0 1-1.6 1.6H5.1A1.6 1.6 0 0 1 3.5 19z"/><path d="M3.5 13.5H9l1.2 2h3.6l1.2-2h5.5"/>',
+        arrow:'<path d="M4 12h15M14 6l6 6-6 6"/>',
+        back:'<path d="M20 12H5M10 6l-6 6 6 6"/>',
+        chevL:'<path d="m14.5 6-6 6 6 6"/>',
+        chevR:'<path d="m9.5 6 6 6-6 6"/>',
+        thermo:'<path d="M10 4a2 2 0 0 1 4 0v8.3a4.5 4.5 0 1 1-4 0z"/><path d="M12 9v7M12 18.5v.1"/>',
+        shield:'<path d="M12 3 5 5.8v5.4c0 4.5 3 7.8 7 9.3 4-1.5 7-4.8 7-9.3V5.8z"/><path d="m9 11.8 2.2 2.2 3.8-4"/>',
+        sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5 5l1.8 1.8M17.2 17.2 19 19M19 5l-1.8 1.8M6.8 17.2 5 19"/>'
+      };
+      function icon(name, cls){
+        return '<span class="ic ' + (cls||'') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATHS[name]||'') + '</svg></span>';
+      }
+      document.querySelectorAll('[data-icon]').forEach(function(el){
+        el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATHS[el.getAttribute('data-icon')] + '</svg>';
+      });
+
+      /* ================= Shared demo state ================= */
+      const ME_ID = 'e1'; // Amelia Hart — the employee signed into the mobile app
+      const DEPARTMENTS = ['Front of House','Kitchen','Retail','Warehouse','Office'];
+      const AV_COLORS = ['#DB2777','#2563EB','#7C3AED','#059669','#D97706','#0891B2','#4F46E5','#B45309','#0F766E','#9333EA','#C026D3','#475569','#BE185D','#1D4ED8'];
+      let empSeq = 12, shiftSeq = 100, reqSeq = 100, actSeq = 0;
+
+      const state = {
+        employees: [
+          {id:'e1',  name:'Amelia Hart',    role:'Sales Assistant',       dept:'Retail',         email:'amelia.hart@harbourandgrey.co.uk',    phone:'07700 900214', status:'Active',   start:'12 Mar 2024', rate:12.40, contracted:40, leaveUsed:9},
+          {id:'e2',  name:'James Okafor',   role:'Shift Supervisor',      dept:'Front of House', email:'james.okafor@harbourandgrey.co.uk',   phone:'07700 900317', status:'Active',   start:'3 Jun 2022',  rate:16.75, contracted:40, leaveUsed:12},
+          {id:'e3',  name:'Sophie Bennett', role:'Barista',               dept:'Front of House', email:'sophie.bennett@harbourandgrey.co.uk', phone:'07700 900402', status:'Active',   start:'19 Sep 2023', rate:11.80, contracted:40, leaveUsed:15},
+          {id:'e4',  name:'Liam Murphy',    role:'Chef de Partie',        dept:'Kitchen',        email:'liam.murphy@harbourandgrey.co.uk',    phone:'07700 900518', status:'Active',   start:'27 Jan 2023', rate:15.20, contracted:40, leaveUsed:6},
+          {id:'e5',  name:'Priya Shah',     role:'Administrator',         dept:'Office',         email:'priya.shah@harbourandgrey.co.uk',     phone:'07700 900623', status:'Active',   start:'8 Nov 2022',  rate:14.60, contracted:40, leaveUsed:10},
+          {id:'e6',  name:'Daniel Reeves',  role:'Warehouse Operative',   dept:'Warehouse',      email:'daniel.reeves@harbourandgrey.co.uk',  phone:'07700 900731', status:'Active',   start:'15 May 2024', rate:12.10, contracted:40, leaveUsed:4},
+          {id:'e7',  name:'Emily Clarke',   role:'Sales Assistant',       dept:'Retail',         email:'emily.clarke@harbourandgrey.co.uk',   phone:'07700 900845', status:'On leave', start:'2 Feb 2023',  rate:12.40, contracted:40, leaveUsed:18},
+          {id:'e8',  name:'Oliver Grant',   role:'Store Manager',         dept:'Retail',         email:'oliver.grant@harbourandgrey.co.uk',   phone:'07700 900902', status:'Active',   start:'10 Oct 2021', rate:18.50, contracted:40, leaveUsed:8},
+          {id:'e9',  name:'Grace Adeyemi',  role:'Kitchen Porter',        dept:'Kitchen',        email:'grace.adeyemi@harbourandgrey.co.uk',  phone:'07700 900156', status:'Part-time',start:'6 Jun 2025',  rate:11.50, contracted:20, leaveUsed:3},
+          {id:'e10', name:'Harry Thompson', role:'Front of House Server', dept:'Front of House', email:'harry.thompson@harbourandgrey.co.uk', phone:'07700 900267', status:'Active',   start:'21 Aug 2023', rate:11.65, contracted:40, leaveUsed:11},
+          {id:'e11', name:'Isla McDonald',  role:'Warehouse Team Lead',   dept:'Warehouse',      email:'isla.mcdonald@harbourandgrey.co.uk',  phone:'07700 900378', status:'Active',   start:'30 Apr 2022', rate:15.90, contracted:40, leaveUsed:14},
+          {id:'e12', name:'Noah Williams',  role:'Accounts Assistant',    dept:'Office',         email:'noah.williams@harbourandgrey.co.uk',  phone:'07700 900489', status:'Part-time',start:'13 Jan 2025', rate:13.75, contracted:20, leaveUsed:5}
+        ],
+        // day: 0=Mon 19 Oct … 6=Sun 25 Oct 2026
+        required: [11, 11, 10, 9, 10, 9, 6],
+        shifts: [],
+        leave: [
+          {id:'r1', emp:'e1',  type:'Annual Leave', start:'2026-11-02', end:'2026-11-06', reason:'Family trip to the Lake District — booked earlier this year.', status:'Pending'},
+          {id:'r2', emp:'e6',  type:'Sick',         start:'2026-10-22', end:'2026-10-23', reason:'Flu symptoms; GP advised two days of rest.', status:'Pending'},
+          {id:'r3', emp:'e10', type:'Annual Leave', start:'2026-11-09', end:'2026-11-11', reason:'City break in Edinburgh with friends.', status:'Pending'},
+          {id:'r4', emp:'e7',  type:'Annual Leave', start:'2026-10-19', end:'2026-10-23', reason:'Pre-booked family holiday in Cornwall.', status:'Approved'},
+          {id:'r5', emp:'e11', type:'Annual Leave', start:'2026-10-26', end:'2026-10-28', reason:'Visiting family in Inverness.', status:'Approved'},
+          {id:'r6', emp:'e12', type:'Sick',         start:'2026-10-22', end:'2026-10-22', reason:'Migraine — unable to work Thursday.', status:'Approved'},
+          {id:'r7', emp:'e3',  type:'Annual Leave', start:'2026-10-05', end:'2026-10-09', reason:'Autumn break in Bath.', status:'Approved'},
+          {id:'r8', emp:'e9',  type:'Sick',         start:'2026-10-07', end:'2026-10-07', reason:'Stomach bug — reported by phone at 07:10.', status:'Approved'},
+          {id:'r9', emp:'e4',  type:'Annual Leave', start:'2026-10-12', end:'2026-10-16', reason:'Requested at short notice for a family event.', status:'Declined'},
+          {id:'r10',emp:'e5',  type:'Annual Leave', start:'2026-09-14', end:'2026-09-18', reason:'Holiday in Lisbon.', status:'Approved'},
+          {id:'r11',emp:'e1',  type:'Annual Leave', start:'2026-08-17', end:'2026-08-21', reason:'Summer holiday in Norfolk.', status:'Approved'},
+          {id:'r12',emp:'e1',  type:'Sick',         start:'2026-09-29', end:'2026-09-29', reason:'Cold — reported via the app in the morning.', status:'Approved'}
+        ],
+        payroll: {
+          '2026-10': { e1:{reg:152,ot:6}, e2:{reg:168,ot:10}, e3:{reg:160,ot:4}, e4:{reg:164,ot:12}, e5:{reg:160,ot:2}, e6:{reg:168,ot:8}, e7:{reg:120,ot:0}, e8:{reg:172,ot:6}, e9:{reg:88,ot:0}, e10:{reg:156,ot:5}, e11:{reg:164,ot:9}, e12:{reg:84,ot:0} },
+          '2026-09': { e1:{reg:148,ot:3}, e2:{reg:160,ot:8}, e3:{reg:156,ot:2}, e4:{reg:160,ot:9}, e5:{reg:152,ot:0}, e6:{reg:160,ot:6}, e7:{reg:152,ot:4}, e8:{reg:168,ot:4}, e9:{reg:84,ot:0}, e10:{reg:148,ot:3}, e11:{reg:158,ot:7}, e12:{reg:80,ot:0} }
+        },
+        activity: [
+          {icon:'thermo', color:'var(--red)', bg:'var(--red-bg)', text:'<b>Daniel Reeves</b> reported sick for Thu 22 – Fri 23 Oct — awaiting review.', time:'Today, 07:42'},
+          {icon:'check', color:'var(--green-dark)', bg:'var(--green-bg)', text:'<b>Isla McDonald\u2019s</b> annual leave (26–28 Oct) was approved.', time:'Yesterday, 16:20'},
+          {icon:'calendar', color:'var(--blue-dark)', bg:'var(--navy-soft)', text:'October rota (19–25 Oct) was <b>published</b> to all 12 staff.', time:'Yesterday, 09:05'},
+          {icon:'userplus', color:'var(--blue-dark)', bg:'var(--navy-soft)', text:'<b>Noah Williams</b> was added to the Office department.', time:'Mon, 11:31'},
+          {icon:'file', color:'var(--amber)', bg:'var(--amber-bg)', text:'Payroll report generated for <b>September 2026</b> (demo data).', time:'1 Oct, 15:44'}
+        ],
+        notifications: [
+          {id:1, icon:'calendar', color:'var(--blue-dark)', bg:'var(--navy-soft)', title:'October rota published', body:'Your shifts for Mon 19 – Sun 25 Oct are ready to view.', time:'Mon 08:02', unread:true},
+          {id:2, icon:'clock', color:'var(--amber)', bg:'var(--amber-bg)', title:'Shift time updated', body:'Your Saturday 24 Oct shift now starts at 09:00 (was 10:00).', time:'Tue 14:37', unread:true},
+          {id:3, icon:'file', color:'var(--green-dark)', bg:'var(--green-bg)', title:'Payslip available', body:'Your September 2026 payslip summary is ready to view.', time:'1 Oct', unread:false}
+        ],
+        weekOffset: 0,
+        leaveFilter: 'All',
+        calCursor: {y:2026, m:9},
+        profileId: null,
+        assignShiftId: null,
+        notifSeq: 3
+      };
+
+      function seedShifts(){
+        const S = [];
+        function add(emp, day, start, end, status){ S.push({id:'s'+(++shiftSeq), emp:emp, day:day, start:start, end:end, status:status||'Confirmed'}); }
+        // Mon 19
+        add('e2',0,'08:00','16:00'); add('e3',0,'07:00','15:00'); add('e10',0,'12:00','20:00');
+        add('e4',0,'10:00','18:00'); add('e9',0,'09:00','14:00'); add('e1',0,'09:00','17:00');
+        add('e8',0,'09:00','17:00'); add('e6',0,'06:00','14:00'); add('e11',0,'06:00','14:00');
+        add('e5',0,'09:00','17:00'); add('e12',0,'09:00','13:00');
+        // Tue 20 — Daniel has an overlapping pair (conflict demo)
+        add('e2',1,'08:00','16:00'); add('e3',1,'07:00','15:00'); add('e10',1,'12:00','20:00','Pending swap');
+        add('e4',1,'10:00','18:00'); add('e9',1,'09:00','14:00'); add('e1',1,'09:00','17:00');
+        add('e8',1,'09:00','17:00'); add('e6',1,'06:00','14:00'); add('e6',1,'13:00','17:00');
+        add('e11',1,'06:00','14:00'); add('e5',1,'09:00','17:00');
+        // Wed 21 (today)
+        add('e2',2,'08:00','16:00'); add('e3',2,'07:00','15:00'); add('e10',2,'12:00','20:00');
+        add('e4',2,'10:00','18:00'); add('e1',2,'09:00','17:00'); add('e8',2,'09:00','17:00');
+        add('e6',2,'06:00','14:00'); add('e11',2,'06:00','14:00'); add('e5',2,'09:00','17:00');
+        add('e12',2,'09:00','13:00');
+        // Thu 22
+        add('e2',3,'08:00','16:00'); add('e3',3,'07:00','15:00'); add('e10',3,'12:00','20:00');
+        add('e4',3,'10:00','18:00'); add('e9',3,'09:00','14:00'); add('e1',3,'10:00','14:00');
+        add('e6',3,'06:00','14:00'); add('e11',3,'06:00','14:00'); add('e5',3,'09:00','17:00');
+        // Fri 23 — understaffed (7 assigned + 2 open vs 10 required)
+        add('e2',4,'08:00','16:00'); add('e3',4,'07:00','15:00'); add('e10',4,'12:00','20:00');
+        add('e4',4,'10:00','18:00'); add('e9',4,'09:00','14:00'); add('e6',4,'06:00','14:00');
+        add('e5',4,'09:00','17:00');
+        S.push({id:'s'+(++shiftSeq), emp:null, day:4, start:'07:00', end:'15:00', role:'Barista', status:'Open'});
+        S.push({id:'s'+(++shiftSeq), emp:null, day:4, start:'10:00', end:'18:00', role:'Sales Assistant', status:'Open'});
+        // Sat 24
+        add('e2',5,'09:00','17:00'); add('e3',5,'08:00','16:00'); add('e10',5,'12:00','20:00');
+        add('e4',5,'11:00','19:00'); add('e1',5,'09:00','17:00'); add('e8',5,'09:00','17:00');
+        add('e6',5,'07:00','15:00'); add('e11',5,'07:00','15:00'); add('e9',5,'10:00','15:00');
+        // Sun 25
+        add('e3',6,'09:00','15:00'); add('e10',6,'11:00','17:00'); add('e1',6,'10:00','14:00');
+        add('e4',6,'11:00','17:00'); add('e11',6,'08:00','14:00'); add('e8',6,'10:00','16:00');
+        state.shifts = S;
+      }
+
+      /* ================= Helpers ================= */
+      const $ = function(id){ return document.getElementById(id); };
+      const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const BASE_MONDAY = new Date(2026, 9, 19);
+      const TODAY = new Date(2026, 9, 21);
+
+      function empById(id){ return state.employees.find(function(e){ return e.id === id; }); }
+      function initials(name){ return name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase(); }
+      function avatarHTML(e, size){
+        const idx = state.employees.indexOf(e);
+        const col = AV_COLORS[(idx >= 0 ? idx : 3) % AV_COLORS.length];
+        return '<div class="avatar" style="width:'+size+'px;height:'+size+'px;font-size:'+Math.round(size*0.38)+'px;background:'+col+';">' + initials(e.name) + '</div>';
+      }
+      function gbp(n){ return '\u00A3' + n.toLocaleString('en-GB',{minimumFractionDigits:2, maximumFractionDigits:2}); }
+      function gbp0(n){ return '\u00A3' + Math.round(n).toLocaleString('en-GB'); }
+      function parseISO(s){ const p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+      function fmtD(d){ return DAYS[(d.getDay()+6)%7] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0,3); }
+      function fmtRange(r){
+        const a = parseISO(r.start), b = parseISO(r.end);
+        if (r.start === r.end) return fmtD(a);
+        return fmtD(a) + ' \u2013 ' + fmtD(b);
+      }
+      function reqDays(r){ return Math.round((parseISO(r.end) - parseISO(r.start)) / 86400000) + 1; }
+      function weekMonday(){ const d = new Date(BASE_MONDAY); d.setDate(d.getDate() + state.weekOffset * 7); return d; }
+      function weekDate(dayIdx){ const d = weekMonday(); d.setDate(d.getDate() + dayIdx); return d; }
+      function toMin(t){ const p = t.split(':'); return (+p[0])*60 + (+p[1]); }
+      function shiftHours(s){ return (toMin(s.end) - toMin(s.start)) / 60; }
+      function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+      function statusBadge(st){
+        if (st === 'Active' || st === 'Approved' || st === 'Confirmed') return '<span class="badge b-green">' + st + '</span>';
+        if (st === 'Pending' || st === 'Pending swap' || st === 'On leave') return '<span class="badge b-amber">' + st + '</span>';
+        if (st === 'Declined') return '<span class="badge b-red">' + st + '</span>';
+        if (st === 'Part-time') return '<span class="badge b-blue">' + st + '</span>';
+        return '<span class="badge b-grey">' + st + '</span>';
+      }
+      function typeBadge(t){
+        return t === 'Sick'
+          ? '<span class="badge b-red no-dot">' + icon('thermo') + ' Sick absence</span>'
+          : '<span class="badge b-blue no-dot">' + icon('plane') + ' Annual leave</span>';
+      }
+      function pendingCount(){ return state.leave.filter(function(r){ return r.status === 'Pending'; }).length; }
+      function pushActivity(ic, color, bg, html){
+        state.activity.unshift({icon:ic, color:color, bg:bg, text:html, time:'Just now'});
+      }
+      function pushNotification(title, body, ic, color, bg){
+        state.notifications.unshift({id:++state.notifSeq, icon:ic||'bell', color:color||'var(--blue-dark)', bg:bg||'var(--navy-soft)', title:title, body:body, time:'Just now', unread:true});
+      }
+      function toast(msg, warn){
+        const t = document.createElement('div');
+        t.className = 'toast' + (warn ? ' warn' : '');
+        t.innerHTML = '<span class="t-ic">' + icon(warn ? 'alert' : 'check') + '</span><span>' + msg + '</span>';
+        $('toasts').appendChild(t);
+        setTimeout(function(){ t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function(){ t.remove(); }, 320); }, 3400);
+      }
+      function openModal(id){ $(id).classList.add('open'); }
+      function closeModal(id){ $(id).classList.remove('open'); }
+      document.querySelectorAll('.overlay').forEach(function(o){
+        o.addEventListener('click', function(ev){ if (ev.target === o) o.classList.remove('open'); });
+      });
+      let confirmCb = null;
+      function askConfirm(title, body, yesLabel, cb){
+        $('confirm-title').textContent = title;
+        $('confirm-body').textContent = body;
+        $('confirm-yes').textContent = yesLabel;
+        confirmCb = cb;
+        openModal('modal-confirm');
+      }
+      $('confirm-yes').addEventListener('click', function(){ closeModal('modal-confirm'); if (confirmCb) confirmCb(); });
+
+      /* ================= Navigation ================= */
+      function switchExperience(which){
+        $('seg-manager').classList.toggle('active', which === 'manager');
+        $('seg-mobile').classList.toggle('active', which === 'mobile');
+        $('manager-wrap').classList.toggle('hidden', which !== 'manager');
+        $('mobile-wrap').classList.toggle('active', which === 'mobile');
+        window.scrollTo({top:0});
+      }
+      function showPage(page){
+        document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+        $('page-' + page).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.toggle('active', n.getAttribute('data-nav') === page); });
+        if (page === 'profile') document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.toggle('active', n.getAttribute('data-nav') === 'staff'); });
+        window.scrollTo({top:0});
+      }
+      function quickReview(){ showPage('leave'); setLeaveFilter('Pending'); }
+      function quickCreateShift(){ showPage('schedule'); openAddShift(); }
+
+      /* ================= Dashboard ================= */
+      function dayCoverage(day){
+        const scheduled = state.shifts.filter(function(s){ return s.day === day && s.emp; }).length;
+        const req = state.required[day];
+        return { scheduled: scheduled, required: req, pct: Math.min(100, Math.round(scheduled / req * 100)) };
+      }
+      function payrollTotals(period){
+        const data = state.payroll[period];
+        let reg = 0, ot = 0, cost = 0;
+        state.employees.forEach(function(e){
+          const p = data[e.id] || {reg:0, ot:0};
+          reg += p.reg; ot += p.ot;
+          cost += e.rate * p.reg + e.rate * 1.5 * p.ot;
+        });
+        return { reg: reg, ot: ot, hours: reg + ot, cost: cost };
+      }
+      function upcomingAbsences(){
+        const end = new Date(TODAY); end.setDate(end.getDate() + 7);
+        return state.leave.filter(function(r){
+          if (r.status !== 'Approved') return false;
+          return parseISO(r.end) >= TODAY && parseISO(r.start) <= end;
+        }).length;
+      }
+      function renderDashboard(){
+        const onShift = new Set(state.shifts.filter(function(s){ return s.day === 2 && s.emp; }).map(function(s){ return s.emp; })).size;
+        const pending = pendingCount();
+        const kpis = [
+          {icon:'users', bg:'var(--navy-soft)', color:'var(--blue-dark)', num: state.employees.length, lab:'Total employees', delta:'Across 5 departments'},
+          {icon:'clock', bg:'var(--green-bg)', color:'var(--green-dark)', num: onShift, lab:'Staff on shift today', delta:'Wednesday 21 Oct rota'},
+          {icon:'inbox', bg:'var(--amber-bg)', color:'var(--amber)', num: pending, lab:'Pending leave requests', delta: pending ? 'Waiting for your review' : 'All caught up'},
+          {icon:'plane', bg:'var(--navy-soft)', color:'var(--blue-dark)', num: upcomingAbsences(), lab:'Upcoming absences', delta:'Next 7 days (approved)'}
+        ];
+        $('kpi-grid').innerHTML = kpis.map(function(k){
+          return '<div class="card kpi"><div class="k-ic" style="background:'+k.bg+';color:'+k.color+';">' + icon(k.icon) + '</div>' +
+            '<div><div class="k-num">' + k.num + '</div><div class="k-lab">' + k.lab + '</div><div class="k-delta">' + k.delta + '</div></div></div>';
+        }).join('');
+        // weekly coverage
+        $('cov-week').innerHTML = DAYS.map(function(d, i){
+          const c = dayCoverage(i);
+          const isToday = i === 2 && state.weekOffset === 0;
+          return '<div class="cov-day' + (isToday ? ' today' : '') + (c.pct < 90 ? ' under' : '') + '">' +
+            '<div class="d-name">' + d + '</div><div class="d-date">' + weekDate(i).getDate() + '</div>' +
+            '<div class="cov-track"><div class="cov-fill' + (c.pct < 90 ? ' low' : '') + '" style="width:' + c.pct + '%;"></div></div>' +
+            '<div class="d-pct">' + c.pct + '%</div><div class="d-sub">' + c.scheduled + ' of ' + c.required + ' staff</div></div>';
+        }).join('');
+        let under = null;
+        for (let i = 0; i < 7; i++){
+          const c = dayCoverage(i);
+          if (c.pct < 90){ under = {day: DAYS_FULL[i], pct: c.pct, short: c.required - c.scheduled, open: state.shifts.filter(function(s){ return !s.emp && s.day === i; }).length}; break; }
+        }
+        $('cov-note').innerHTML = under
+          ? '<b style="color:var(--amber);">' + icon('alert') + ' ' + under.day + ' is understaffed</b> at ' + under.pct + '% cover — ' + under.short + ' staff short of the required level' + (under.open ? ', with ' + under.open + ' open shift' + (under.open === 1 ? '' : 's') + ' posted in the schedule' : '') + '.'
+          : 'Every day this week meets its required cover.';
+        // payroll card
+        const t = payrollTotals('2026-10');
+        $('dash-payroll').innerHTML =
+          '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px;"><span style="color:var(--muted);">Total hours (Oct)</span><b>' + t.hours.toLocaleString('en-GB') + ' hrs</b></div>' +
+          '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px;"><span style="color:var(--muted);">Overtime hours</span><b>' + t.ot + ' hrs</b></div>' +
+          '<div style="display:flex;justify-content:space-between;padding:9px 0 2px;font-size:14.5px;"><span style="color:var(--muted);">Estimated payroll cost</span><b style="font-size:17px;">' + gbp(t.cost) + '</b></div>' +
+          '<p style="font-size:12px;color:var(--faint);margin-top:8px;">Sample figures for demonstration only — no real payroll is processed.</p>';
+        // activity
+        $('activity-feed').innerHTML = state.activity.slice(0, 6).map(function(a){
+          return '<div class="act-row"><div class="act-ic" style="background:' + a.bg + ';color:' + a.color + ';">' + icon(a.icon) + '</div>' +
+            '<div style="min-width:0;"><div class="a-txt">' + a.text + '</div><div class="a-time">' + a.time + '</div></div></div>';
+        }).join('');
+        $('nav-pending-badge').textContent = pending;
+        $('nav-pending-badge').style.display = pending ? 'flex' : 'none';
+        $('qa-pending-sub').textContent = pending === 1 ? '1 request waiting for a decision' : pending + ' requests waiting for a decision';
+        const cc = $('chip-pending-count'); if (cc) cc.textContent = pending ? '(' + pending + ')' : '';
+      }
+
+      /* ================= Staff directory & profile ================= */
+      function renderDeptFilter(){
+        const sel = $('staff-dept');
+        const cur = sel.value;
+        sel.innerHTML = '<option value="">All departments</option>' + DEPARTMENTS.map(function(d){ return '<option' + (d === cur ? ' selected' : '') + '>' + d + '</option>'; }).join('');
+      }
+      function renderDirectory(){
+        const q = $('staff-search').value.trim().toLowerCase();
+        const dept = $('staff-dept').value;
+        const status = $('staff-status').value;
+        const rows = state.employees.filter(function(e){
+          const matchQ = !q || (e.name + ' ' + e.role + ' ' + e.email + ' ' + e.dept).toLowerCase().includes(q);
+          return matchQ && (!dept || e.dept === dept) && (!status || e.status === status);
+        });
+        $('staff-count-sub').textContent = state.employees.length + ' employees across ' + DEPARTMENTS.length + ' departments';
+        if (!rows.length){
+          $('dir-list').innerHTML = '<div class="card empty"><div class="e-ic">' + icon('search') + '</div>' +
+            '<h4>No employees match your search</h4><p>Try a different name, role or department — or clear the filters to see everyone.</p>' +
+            '<button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="clearStaffFilters()">Clear filters</button></div>';
+          return;
+        }
+        $('dir-list').innerHTML = rows.map(function(e){
+          return '<button class="dir-row" onclick="openProfile(\'' + e.id + '\')">' +
+            '<span class="dir-who">' + avatarHTML(e, 42) + '<span style="min-width:0;"><span class="nm">' + esc(e.name) + '</span><br /><span class="rl">' + esc(e.role) + '</span></span></span>' +
+            '<span class="dir-cell hide-m"><span class="c-lab">Department</span><span class="c-val">' + e.dept + '</span></span>' +
+            '<span class="dir-cell hide-m"><span class="c-lab">Contact</span><span class="c-val">' + e.email + '<br />' + e.phone + '</span></span>' +
+            '<span>' + statusBadge(e.status) + '</span>' +
+            '<span class="dir-rate">' + gbp(e.rate) + '<span>per hour</span></span>' +
+          '</button>';
+        }).join('');
+      }
+      function clearStaffFilters(){
+        $('staff-search').value = ''; $('staff-dept').value = ''; $('staff-status').value = '';
+        renderDirectory();
+      }
+      function openProfile(id){
+        state.profileId = id;
+        renderProfile();
+        showPage('profile');
+      }
+      function renderProfile(){
+        const e = empById(state.profileId);
+        if (!e) return;
+        const myShifts = state.shifts.filter(function(s){ return s.emp === e.id; }).sort(function(a,b){ return a.day - b.day; });
+        const myLeave = state.leave.filter(function(r){ return r.emp === e.id; });
+        const remaining = 28 - e.leaveUsed;
+        const oct = state.payroll['2026-10'][e.id] || {reg:0, ot:0};
+        const sep = state.payroll['2026-09'][e.id] || {reg:0, ot:0};
+        function payLine(label, p){
+          const gross = e.rate * p.reg + e.rate * 1.5 * p.ot;
+          return '<div class="mini-row"><span><b>' + label + '</b><br /><span style="color:var(--muted);font-size:12.5px;">' + p.reg + ' regular hrs &middot; ' + p.ot + ' overtime hrs @ ' + gbp(e.rate) + '/hr</span></span><b>' + gbp(gross) + '</b></div>';
+        }
+        $('profile-content').innerHTML =
+          '<div class="card" style="margin-bottom:16px;"><div class="profile-head">' + avatarHTML(e, 64) +
+            '<div style="flex:1;min-width:200px;"><h1 style="font-size:22px;font-weight:800;">' + esc(e.name) + '</h1>' +
+            '<p style="color:var(--muted);">' + esc(e.role) + ' &middot; ' + e.dept + '</p>' +
+            '<div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap;">' + statusBadge(e.status) + '<span class="badge b-grey">' + e.contracted + ' contracted hrs/week</span></div></div>' +
+            '<button class="btn btn-ghost" onclick="openEditEmployee(\'' + e.id + '\')">' + icon('settings') + ' Edit employee</button></div></div>' +
+          '<div class="grid-2">' +
+            '<div class="card"><h3>Work information</h3><div class="kv" style="margin-top:12px;">' +
+              '<div><div class="k">Job role</div><div class="v">' + esc(e.role) + '</div></div>' +
+              '<div><div class="k">Department</div><div class="v">' + e.dept + '</div></div>' +
+              '<div><div class="k">Start date</div><div class="v">' + e.start + '</div></div>' +
+              '<div><div class="k">Hourly rate</div><div class="v">' + gbp(e.rate) + '</div></div>' +
+              '<div><div class="k">Email</div><div class="v">' + e.email + '</div></div>' +
+              '<div><div class="k">Phone</div><div class="v">' + e.phone + '</div></div>' +
+            '</div></div>' +
+            '<div class="card"><h3>Leave balance</h3><p class="card-sub">Annual allowance 28 days</p>' +
+              '<div style="display:flex;gap:22px;margin-top:12px;font-size:13.5px;"><span>Used: <b>' + e.leaveUsed + ' days</b></span><span>Remaining: <b style="color:var(--green-dark);">' + remaining + ' days</b></span></div>' +
+              '<div class="balance-track"><div class="balance-fill" style="width:' + Math.round(e.leaveUsed / 28 * 100) + '%;"></div></div>' +
+              '<p style="font-size:12.5px;color:var(--muted);">' + Math.round(e.leaveUsed / 28 * 100) + '% of allowance used this year</p></div>' +
+          '</div>' +
+          '<div class="grid-2">' +
+            '<div class="card"><h3>Assigned shifts — this week</h3><div style="margin-top:8px;">' +
+              (myShifts.length ? myShifts.map(function(s){
+                return '<div class="mini-row"><span><b>' + DAYS_FULL[s.day] + ' ' + weekDate(s.day).getDate() + ' Oct</b><br /><span style="color:var(--muted);font-size:12.5px;">' + s.start + ' \u2013 ' + s.end + ' &middot; ' + esc(s.role || e.role) + '</span></span>' + statusBadge(s.status) + '</div>';
+              }).join('') : '<p style="color:var(--muted);font-size:13.5px;padding:10px 0;">No shifts assigned this week.</p>') +
+            '</div></div>' +
+            '<div class="card"><h3>Leave history &amp; payroll</h3><div style="margin-top:8px;">' +
+              (myLeave.length ? myLeave.slice(0, 4).map(function(r){
+                return '<div class="mini-row"><span><b>' + r.type + '</b><br /><span style="color:var(--muted);font-size:12.5px;">' + fmtRange(r) + ' &middot; ' + reqDays(r) + ' day(s)</span></span>' + statusBadge(r.status) + '</div>';
+              }).join('') : '<p style="color:var(--muted);font-size:13.5px;">No leave recorded yet.</p>') +
+              '<p class="m-sec-title" style="margin:16px 0 4px;">Payroll records <span class="demo-tag">DEMO</span></p>' +
+              payLine('October 2026', oct) + payLine('September 2026', sep) +
+            '</div></div>' +
+          '</div>';
+      }
+
+      /* ---- Add / edit employee ---- */
+      function setFieldErr(input, bad){
+        input.classList.toggle('invalid', bad);
+        input.closest('.field').classList.toggle('has-err', bad);
+        return !bad;
+      }
+      function openAddEmployee(){
+        $('emp-form').reset();
+        $('ef-id').value = '';
+        $('ef-contracted').value = 40;
+        $('emp-modal-title').textContent = 'Add employee';
+        $('emp-save-btn').textContent = 'Save employee';
+        document.querySelectorAll('#emp-form .input').forEach(function(i){ i.classList.remove('invalid'); i.closest('.field').classList.remove('has-err'); });
+        openModal('modal-employee');
+      }
+      function openEditEmployee(id){
+        const e = empById(id);
+        if (!e) return;
+        openAddEmployee();
+        $('ef-id').value = e.id;
+        $('ef-name').value = e.name;
+        $('ef-role').value = e.role;
+        $('ef-dept').value = e.dept;
+        $('ef-status').value = e.status;
+        $('ef-rate').value = e.rate;
+        $('ef-contracted').value = e.contracted;
+        $('ef-email').value = e.email;
+        $('ef-phone').value = e.phone;
+        $('emp-modal-title').textContent = 'Edit employee';
+        $('emp-save-btn').textContent = 'Save changes';
+      }
+      $('emp-form').addEventListener('submit', function(ev){
+        ev.preventDefault();
+        const name = $('ef-name'), role = $('ef-role'), dept = $('ef-dept'), rate = $('ef-rate'), email = $('ef-email');
+        let ok = true;
+        ok = setFieldErr(name, !name.value.trim()) && ok;
+        ok = setFieldErr(role, !role.value) && ok;
+        ok = setFieldErr(dept, !dept.value) && ok;
+        const rv = parseFloat(rate.value);
+        ok = setFieldErr(rate, isNaN(rv) || rv < 11 || rv > 40) && ok;
+        ok = setFieldErr(email, !!email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) && ok;
+        if (!ok) return;
+        const id = $('ef-id').value;
+        if (id){
+          const e = empById(id);
+          e.name = name.value.trim(); e.role = role.value; e.dept = dept.value;
+          e.status = $('ef-status').value; e.rate = rv;
+          e.contracted = parseInt($('ef-contracted').value, 10) || 40;
+          e.email = email.value.trim() || e.email; e.phone = $('ef-phone').value.trim() || e.phone;
+          pushActivity('check', 'var(--green-dark)', 'var(--green-bg)', '<b>' + esc(e.name) + '\u2019s</b> employee record was updated.');
+          toast('Employee record updated for ' + esc(e.name) + '.');
+          if (state.profileId === id) renderProfile();
+        } else {
+          const nid = 'e' + (++empSeq);
+          const slug = name.value.trim().toLowerCase().replace(/[^a-z ]/g,'').split(' ').filter(Boolean).join('.');
+          state.employees.push({
+            id: nid, name: name.value.trim(), role: role.value, dept: dept.value,
+            email: email.value.trim() || (slug + '@harbourandgrey.co.uk'),
+            phone: $('ef-phone').value.trim() || '07700 900000',
+            status: $('ef-status').value, start: '21 Oct 2026', rate: rv,
+            contracted: parseInt($('ef-contracted').value, 10) || 40, leaveUsed: 0
+          });
+          state.payroll['2026-10'][nid] = {reg:0, ot:0};
+          state.payroll['2026-09'][nid] = {reg:0, ot:0};
+          pushActivity('userplus', 'var(--blue-dark)', 'var(--navy-soft)', '<b>' + esc(name.value.trim()) + '</b> joined the ' + dept.value + ' department.');
+          toast(esc(name.value.trim()) + ' added — the directory now has ' + state.employees.length + ' employees.');
+        }
+        closeModal('modal-employee');
+        refreshAll();
+      });
+
+      /* ================= Schedule ================= */
+      function conflictIds(){
+        const bad = {};
+        state.employees.forEach(function(e){
+          for (let d = 0; d < 7; d++){
+            const mine = state.shifts.filter(function(s){ return s.emp === e.id && s.day === d; });
+            for (let i = 0; i < mine.length; i++) for (let j = i + 1; j < mine.length; j++){
+              if (toMin(mine[i].start) < toMin(mine[j].end) && toMin(mine[j].start) < toMin(mine[i].end)){ bad[mine[i].id] = true; bad[mine[j].id] = true; }
+            }
+          }
+        });
+        return bad;
+      }
+      function otherShiftLabel(s){
+        const other = state.shifts.find(function(x){ return x.emp === s.emp && x.day === s.day && x.id !== s.id && toMin(x.start) < toMin(s.end) && toMin(s.start) < toMin(x.end); });
+        return other ? other.start + '\u2013' + other.end : '';
+      }
+      function renderSchedule(){
+        const mon = weekMonday(), sun = weekDate(6);
+        $('week-label').textContent = mon.getDate() + ' \u2013 ' + sun.getDate() + ' ' + MONTHS[sun.getMonth()].slice(0,3) + ' ' + sun.getFullYear();
+        const open = state.shifts.filter(function(s){ return !s.emp; });
+        $('open-strip-wrap').innerHTML = open.length
+          ? '<div class="card" style="padding:14px 18px;"><div style="display:flex;gap:8px;align-items:center;"><b>' + icon('alert') + ' Unassigned / open shifts (' + open.length + ')</b><span style="color:var(--muted);font-size:12.5px;">These shifts have nobody rostered yet.</span></div><div class="open-strip">' +
+            open.map(function(s){
+              return '<div class="open-chip"><span><b>' + DAYS[s.day] + ' ' + weekDate(s.day).getDate() + ' Oct</b> &middot; ' + s.start + '\u2013' + s.end + ' &middot; ' + esc(s.role) + '</span><button class="btn btn-sm btn-green" onclick="openAssign(\'' + s.id + '\')">Assign</button></div>';
+            }).join('') + '</div></div>'
+          : '';
+        const bad = conflictIds();
+        $('sched-grid').innerHTML = DAYS.map(function(d, day){
+          const c = dayCoverage(day);
+          const dayShifts = state.shifts.filter(function(s){ return s.day === day; })
+            .sort(function(a,b){ return toMin(a.start) - toMin(b.start) || (a.emp ? 0 : 1) - (b.emp ? 0 : 1); });
+          const isToday = day === 2 && state.weekOffset === 0;
+          let html = '<div class="sched-day' + (isToday ? ' today' : '') + '"><div class="sd-head">' +
+            '<div class="sd-name"><span>' + d + (isToday ? ' \u00B7 Today' : '') + '</span>' + (c.pct < 90 ? '<span class="badge b-amber">Understaffed</span>' : '') + '</div>' +
+            '<div class="sd-date">' + weekDate(day).getDate() + ' ' + MONTHS[weekDate(day).getMonth()].slice(0,3) + '</div>' +
+            '<div class="sd-cov">Cover ' + c.pct + '% \u00B7 ' + c.scheduled + '/' + c.required + ' staff</div></div>';
+          dayShifts.forEach(function(s){
+            if (!s.emp){
+              html += '<div class="shift-card open-card">Open shift<br />' + s.start + '\u2013' + s.end + ' &middot; ' + esc(s.role) + '<br /><button class="btn btn-sm" style="margin-top:7px;" onclick="openAssign(\'' + s.id + '\')">Assign</button></div>';
+              return;
+            }
+            const e = empById(s.emp);
+            const conflict = bad[s.id];
+            html += '<div class="shift-card' + (conflict ? ' conflict' : '') + '"><div class="sc-top">' + avatarHTML(e, 24) +
+              '<span class="sc-name">' + esc(e.name) + '</span></div>' +
+              '<div class="sc-time">' + s.start + ' \u2013 ' + s.end + '</div>' +
+              '<div class="sc-role">' + esc(s.role || e.role) + '</div>' +
+              '<div style="margin-top:5px;">' + statusBadge(s.status) + '</div>' +
+              (conflict ? '<div class="conflict-note">' + icon('alert') + '<span>Overlaps with the ' + otherShiftLabel(s) + ' shift \u2014 same employee double-booked.</span></div>' : '') +
+              '</div>';
+          });
+          if (!dayShifts.length) html += '<p style="font-size:12px;color:var(--faint);text-align:center;padding:12px 0;">No shifts</p>';
+          return html + '</div>';
+        }).join('');
+      }
+      function changeWeek(delta){ state.weekOffset += delta; renderSchedule(); renderDashboard(); }
+      function resetWeek(){ state.weekOffset = 0; renderSchedule(); renderDashboard(); }
+      function fillShiftFormOptions(){
+        $('sf-emp').innerHTML = state.employees.map(function(e){ return '<option value="' + e.id + '">' + esc(e.name) + ' \u2014 ' + esc(e.role) + '</option>'; }).join('') +
+          '<option value="open">Open shift (unassigned)</option>';
+        $('sf-day').innerHTML = DAYS.map(function(d, i){ return '<option value="' + i + '"' + (i === 2 ? ' selected' : '') + '>' + d + ' ' + weekDate(i).getDate() + ' ' + MONTHS[weekDate(i).getMonth()].slice(0,3) + '</option>'; }).join('');
+      }
+      function openAddShift(){
+        fillShiftFormOptions();
+        $('sf-role').value = '';
+        $('sf-end').classList.remove('invalid'); $('sf-end').closest('.field').classList.remove('has-err');
+        openModal('modal-shift');
+      }
+      $('shift-form').addEventListener('submit', function(ev){
+        ev.preventDefault();
+        const start = $('sf-start').value, end = $('sf-end').value;
+        const badTime = !start || !end || toMin(end) <= toMin(start);
+        setFieldErr($('sf-end'), badTime);
+        if (badTime) return;
+        const empVal = $('sf-emp').value;
+        const day = parseInt($('sf-day').value, 10);
+        const role = $('sf-role').value.trim();
+        const ns = { id:'s' + (++shiftSeq), emp: empVal === 'open' ? null : empVal, day: day, start: start, end: end, status: empVal === 'open' ? 'Open' : 'Confirmed' };
+        if (empVal === 'open') ns.role = role || 'General shift';
+        else if (role) ns.role = role;
+        state.shifts.push(ns);
+        closeModal('modal-shift');
+        refreshAll();
+        const c = dayCoverage(day);
+        if (empVal === 'open') toast('Open shift added to ' + DAYS_FULL[day] + ' \u2014 assign it from the schedule.');
+        else toast('Shift added for ' + esc(empById(empVal).name) + ' on ' + DAYS_FULL[day] + '. Cover is now ' + c.pct + '%.');
+      });
+      function openAssign(shiftId){
+        state.assignShiftId = shiftId;
+        const s = state.shifts.find(function(x){ return x.id === shiftId; });
+        $('assign-sub').textContent = DAYS_FULL[s.day] + ' ' + weekDate(s.day).getDate() + ' Oct \u00B7 ' + s.start + '\u2013' + s.end + ' \u00B7 ' + (s.role || 'General shift') + '. Choose who covers it.';
+        const busy = new Set(state.shifts.filter(function(x){ return x.day === s.day && x.emp; }).map(function(x){ return x.emp; }));
+        const free = state.employees.filter(function(e){ return !busy.has(e.id); });
+        $('as-emp').innerHTML = (free.length ? free : state.employees).map(function(e){
+          return '<option value="' + e.id + '">' + esc(e.name) + ' \u2014 ' + esc(e.role) + (busy.has(e.id) ? ' (already on shift that day)' : '') + '</option>';
+        }).join('');
+        openModal('modal-assign');
+      }
+      function confirmAssign(){
+        const s = state.shifts.find(function(x){ return x.id === state.assignShiftId; });
+        const e = empById($('as-emp').value);
+        if (!s || !e) return;
+        s.emp = e.id; s.status = 'Confirmed';
+        pushActivity('check', 'var(--green-dark)', 'var(--green-bg)', '<b>' + esc(e.name) + '</b> was assigned to the open ' + DAYS[s.day] + ' shift (' + s.start + '\u2013' + s.end + ').');
+        closeModal('modal-assign');
+        refreshAll();
+        const c = dayCoverage(s.day);
+        toast(esc(e.name) + ' assigned. ' + DAYS_FULL[s.day] + ' cover is now ' + c.pct + '%.');
+        if (e.id === ME_ID) pushNotification('You\u2019ve been assigned a shift', DAYS_FULL[s.day] + ' ' + s.start + '\u2013' + s.end + ' \u00B7 ' + (s.role || e.role) + '.', 'calendar');
+      }
+
+      /* ================= Leave & absence ================= */
+      function setLeaveFilter(f){
+        state.leaveFilter = f;
+        document.querySelectorAll('#leave-chips .chip').forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-filter') === f); });
+        renderLeave();
+      }
+      function balanceAfter(r){
+        const e = empById(r.emp);
+        const remaining = 28 - e.leaveUsed;
+        return r.status === 'Approved' ? remaining : remaining - reqDays(r);
+      }
+      function renderLeave(){
+        const f = state.leaveFilter;
+        const list = state.leave.filter(function(r){ return f === 'All' || r.status === f; });
+        if (!list.length){
+          $('leave-list').innerHTML = '<div class="card empty"><div class="e-ic">' + icon('inbox') + '</div><h4>No ' + f.toLowerCase() + ' requests</h4><p>There are no requests with this status right now. New submissions will appear here automatically.</p></div>';
+        } else {
+          $('leave-list').innerHTML = list.map(function(r){
+            const e = empById(r.emp);
+            const days = reqDays(r);
+            const remaining = 28 - e.leaveUsed;
+            return '<div class="req-card"><div class="req-top">' + avatarHTML(e, 40) +
+              '<div style="flex:1;min-width:140px;"><div class="nm">' + esc(e.name) + '</div><div style="font-size:12.5px;color:var(--muted);">' + esc(e.role) + ' &middot; ' + e.dept + '</div></div>' +
+              typeBadge(r.type) + statusBadge(r.status) + '</div>' +
+              '<div class="req-meta">' +
+                '<div><span class="m-lab">Dates</span>' + fmtRange(r) + ' 2026</div>' +
+                '<div><span class="m-lab">Duration</span>' + days + (days === 1 ? ' day' : ' days') + '</div>' +
+                '<div><span class="m-lab">Leave balance</span>' + remaining + ' days left \u2192 <b>' + balanceAfter(r) + ' days</b> after</div>' +
+              '</div>' +
+              '<div class="req-reason">\u201C' + esc(r.reason) + '\u201D</div>' +
+              (r.status === 'Pending'
+                ? '<div class="req-actions"><button class="btn btn-green btn-sm" onclick="approveLeave(\'' + r.id + '\')">' + icon('check') + ' Approve</button>' +
+                  '<button class="btn btn-danger btn-sm" onclick="declineLeave(\'' + r.id + '\')">' + icon('x') + ' Decline</button></div>'
+                : '') +
+            '</div>';
+          }).join('');
+        }
+        $('balance-list').innerHTML = state.employees.map(function(e){
+          const remaining = 28 - e.leaveUsed;
+          return '<div class="bal-row">' + avatarHTML(e, 32) + '<div><div class="b-nm">' + esc(e.name) + '</div><div style="font-size:11.5px;color:var(--faint);">' + e.dept + '</div></div>' +
+            '<div class="b-nums">Used ' + e.leaveUsed + ' &middot; <b>' + remaining + ' left</b><div class="balance-track" style="width:110px;margin:5px 0 0 auto;"><div class="balance-fill" style="width:' + Math.round(e.leaveUsed / 28 * 100) + '%;"></div></div></div></div>';
+        }).join('');
+        renderCalendar();
+      }
+      function approveLeave(id){
+        const r = state.leave.find(function(x){ return x.id === id; });
+        if (!r || r.status !== 'Pending') return;
+        r.status = 'Approved';
+        const e = empById(r.emp);
+        e.leaveUsed += reqDays(r);
+        pushActivity('check', 'var(--green-dark)', 'var(--green-bg)', '<b>' + esc(e.name) + '\u2019s</b> ' + r.type.toLowerCase() + ' (' + fmtRange(r) + ') was <b>approved</b>.');
+        if (r.emp === ME_ID) pushNotification('Leave approved', 'Your ' + r.type.toLowerCase() + ' request (' + fmtRange(r) + ') was approved by Oliver Grant.', 'check', 'var(--green-dark)', 'var(--green-bg)');
+        toast('Approved — ' + esc(e.name) + '\u2019s ' + r.type.toLowerCase() + ' request is confirmed.');
+        refreshAll();
+      }
+      function declineLeave(id){
+        const r = state.leave.find(function(x){ return x.id === id; });
+        if (!r || r.status !== 'Pending') return;
+        const e = empById(r.emp);
+        askConfirm('Decline this request?', e.name + '\u2019s ' + r.type.toLowerCase() + ' (' + fmtRange(r) + ') will be marked as declined and the employee notified.', 'Yes, decline', function(){
+          r.status = 'Declined';
+          pushActivity('x', 'var(--red)', 'var(--red-bg)', '<b>' + esc(e.name) + '\u2019s</b> ' + r.type.toLowerCase() + ' request (' + fmtRange(r) + ') was <b>declined</b>.');
+          if (r.emp === ME_ID) pushNotification('Request declined', 'Your ' + r.type.toLowerCase() + ' request (' + fmtRange(r) + ') was declined. Speak to your manager for details.', 'x', 'var(--red)', 'var(--red-bg)');
+          toast('Request declined — ' + esc(e.name) + ' has been notified in the app.', true);
+          refreshAll();
+        });
+      }
+      function renderCalendar(){
+        const y = state.calCursor.y, m = state.calCursor.m;
+        $('cal-label').textContent = MONTHS[m] + ' ' + y;
+        $('cal-dow').innerHTML = DAYS.map(function(d){ return '<div class="cal-dow">' + d + '</div>'; }).join('');
+        const first = new Date(y, m, 1);
+        const startBlank = (first.getDay() + 6) % 7;
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        let html = '';
+        for (let i = 0; i < startBlank; i++) html += '<div class="cal-cell blank"></div>';
+        for (let dnum = 1; dnum <= daysInMonth; dnum++){
+          const cellDate = new Date(y, m, dnum);
+          const covering = state.leave.filter(function(r){
+            return r.status !== 'Declined' && cellDate >= parseISO(r.start) && cellDate <= parseISO(r.end);
+          });
+          const isToday = y === 2026 && m === 9 && dnum === 21;
+          html += '<div class="cal-cell' + (isToday ? ' today' : '') + '"><div class="cd">' + dnum + (isToday ? ' \u00B7 today' : '') + '</div>' +
+            covering.slice(0, 2).map(function(r){
+              const e = empById(r.emp);
+              return '<div class="cal-pill ' + (r.status === 'Approved' ? 'approved' : 'pending') + '">' + initials(e.name) + ' \u00B7 ' + (r.type === 'Sick' ? 'Sick' : 'Leave') + '</div>';
+            }).join('') +
+            (covering.length > 2 ? '<div class="cal-more">+' + (covering.length - 2) + ' more</div>' : '') +
+            '</div>';
+        }
+        $('cal-grid').innerHTML = html;
+      }
+      function changeCalMonth(delta){
+        state.calCursor.m += delta;
+        if (state.calCursor.m < 0){ state.calCursor.m = 11; state.calCursor.y--; }
+        if (state.calCursor.m > 11){ state.calCursor.m = 0; state.calCursor.y++; }
+        renderCalendar();
+      }
+
+      /* ================= Payroll ================= */
+      function periodLabel(p){ return p === '2026-10' ? 'October 2026' : 'September 2026'; }
+      function periodFile(p){ return p === '2026-10' ? 'oct' : 'sep'; }
+      function renderPayroll(){
+        const period = $('pay-period').value;
+        const data = state.payroll[period];
+        const t = payrollTotals(period);
+        const kpis = [
+          {icon:'clock', bg:'var(--navy-soft)', color:'var(--blue-dark)', num: t.hours.toLocaleString('en-GB') + ' hrs', lab:'Total hours worked'},
+          {icon:'sun', bg:'var(--amber-bg)', color:'var(--amber)', num: t.ot + ' hrs', lab:'Overtime hours (at 1.5\u00D7)'},
+          {icon:'pound', bg:'var(--green-bg)', color:'var(--green-dark)', num: gbp(t.cost), lab:'Estimated payroll cost'}
+        ];
+        $('pay-kpis').innerHTML = kpis.map(function(k){
+          return '<div class="card kpi"><div class="k-ic" style="background:'+k.bg+';color:'+k.color+';">' + icon(k.icon) + '</div>' +
+            '<div><div class="k-num" style="font-size:23px;">' + k.num + '</div><div class="k-lab">' + k.lab + '</div><div class="k-delta">' + periodLabel(period) + ' &middot; demo data</div></div></div>';
+        }).join('');
+        let rows = state.employees.map(function(e){
+          const p = data[e.id] || {reg:0, ot:0};
+          const gross = e.rate * p.reg + e.rate * 1.5 * p.ot;
+          return '<div class="pay-row"><div class="pay-who">' + avatarHTML(e, 32) + '<div style="min-width:0;"><div class="nm">' + esc(e.name) + '</div><div class="dp">' + e.dept + '</div></div></div>' +
+            '<div class="num">' + gbp(e.rate) + '</div><div class="num">' + p.reg + '</div><div class="num">' + p.ot + '</div>' +
+            '<div class="num pay-opt">' + gbp(e.rate * 1.5) + '</div><div class="num"><b>' + gbp(gross) + '</b></div></div>';
+        }).join('');
+        rows += '<div class="pay-row total"><div>Total \u2014 ' + periodLabel(period) + '</div><div class="num"></div><div class="num">' + t.reg + '</div><div class="num">' + t.ot + '</div><div class="num pay-opt"></div><div class="num">' + gbp(t.cost) + '</div></div>';
+        $('pay-rows').innerHTML = rows;
+      }
+      function openReport(){
+        const period = $('pay-period').value;
+        const data = state.payroll[period];
+        const t = payrollTotals(period);
+        $('report-title').textContent = 'Payroll report \u2014 ' + periodLabel(period);
+        let lines = state.employees.map(function(e){
+          const p = data[e.id] || {reg:0, ot:0};
+          const gross = e.rate * p.reg + e.rate * 1.5 * p.ot;
+          return '<div class="pay-row"><div class="pay-who"><div><div class="nm">' + esc(e.name) + '</div><div class="dp">' + esc(e.role) + ' &middot; ' + e.dept + '</div></div></div>' +
+            '<div class="num">' + gbp(e.rate) + '</div><div class="num">' + p.reg + '</div><div class="num">' + p.ot + '</div>' +
+            '<div class="num pay-opt">' + gbp(e.rate * 1.5) + '</div><div class="num"><b>' + gbp(gross) + '</b></div></div>';
+        }).join('');
+        $('report-body').innerHTML =
+          '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;">' +
+            '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Total hours</div><div style="font-size:19px;font-weight:800;">' + t.hours.toLocaleString('en-GB') + ' hrs</div></div>' +
+            '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Overtime</div><div style="font-size:19px;font-weight:800;">' + t.ot + ' hrs</div></div>' +
+            '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Estimated cost</div><div style="font-size:19px;font-weight:800;">' + gbp(t.cost) + '</div></div>' +
+          '</div>' +
+          '<div class="pay-head"><div>Employee</div><div class="num">Rate</div><div class="num">Reg hrs</div><div class="num">OT hrs</div><div class="num">OT rate</div><div class="num">Gross</div></div>' + lines +
+          '<div class="pay-row total"><div>Total</div><div class="num"></div><div class="num">' + t.reg + '</div><div class="num">' + t.ot + '</div><div class="num pay-opt"></div><div class="num">' + gbp(t.cost) + '</div></div>' +
+          '<p style="font-size:12px;color:var(--faint);margin-top:12px;">Sample payroll report \u2014 demonstration data only. No real payroll has been processed.</p>';
+        openModal('modal-report');
+      }
+      function downloadCSV(){
+        const period = $('pay-period').value;
+        const data = state.payroll[period];
+        const t = payrollTotals(period);
+        const lines = ['StaffFlow sample payroll report \u2014 ' + periodLabel(period) + ' \u2014 DEMONSTRATION DATA ONLY'];
+        lines.push('Employee,Department,Role,Hourly Rate (GBP),Regular Hours,Overtime Hours,Overtime Rate (GBP),Gross Estimate (GBP)');
+        state.employees.forEach(function(e){
+          const p = data[e.id] || {reg:0, ot:0};
+          const gross = e.rate * p.reg + e.rate * 1.5 * p.ot;
+          lines.push([e.name, e.dept, e.role, e.rate.toFixed(2), p.reg, p.ot, (e.rate * 1.5).toFixed(2), gross.toFixed(2)].join(','));
+        });
+        lines.push(['TOTAL', '', '', '', t.reg, t.ot, '', t.cost.toFixed(2)].join(','));
+        const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'staffflow-payroll-' + periodFile(period) + '-2026-demo.csv';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+        toast('Report downloaded \u2014 staffflow-payroll-' + periodFile(period) + '-2026-demo.csv (demo data).');
+      }
+
+      /* ================= Settings ================= */
+      const ROLE_CAPS = [
+        {role:'Admin', desc:'Full access for business owners and senior managers.', color:'var(--navy)', caps:[['View & edit all staff records', true],['Approve leave & absence', true],['Build & publish rotas', true],['View & export payroll', true],['Manage roles & settings', true]]},
+        {role:'Manager', desc:'Day-to-day team management for department leads.', color:'var(--blue)', caps:[['View staff in own departments', true],['Approve leave & absence', true],['Build & publish rotas', true],['View & export payroll', false],['Manage roles & settings', false]]},
+        {role:'Employee', desc:'Self-service access to their own information only.', color:'var(--green)', caps:[['View own shifts & schedule', true],['Submit leave & sick requests', true],['View own payslip summary', true],['View colleagues\u2019 payroll', false],['Approve requests', false]]}
+      ];
+      function renderSettings(){
+        $('role-grid').innerHTML = ROLE_CAPS.map(function(r, ri){
+          return '<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;"><span style="width:10px;height:10px;border-radius:3px;background:' + r.color + ';"></span><h3>' + r.role + '</h3></div>' +
+            '<p class="card-sub" style="margin-bottom:8px;">' + r.desc + '</p>' +
+            r.caps.map(function(c, ci){
+              return '<div class="cap-row"><span>' + c[0] + '</span><button class="toggle" role="switch" aria-checked="' + c[1] + '" aria-label="' + c[0] + '" onclick="toggleCap(this)"></button></div>';
+            }).join('') + '</div>';
+        }).join('');
+        $('dept-list').innerHTML = DEPARTMENTS.map(function(d){
+          const n = state.employees.filter(function(e){ return e.dept === d; }).length;
+          return '<div class="set-row"><div><div class="s-nm">' + d + '</div><div class="s-sub">' + n + (n === 1 ? ' employee' : ' employees') + '</div></div><div class="s-right"><span class="badge b-blue no-dot">' + n + ' staff</span></div></div>';
+        }).join('');
+        const roleCounts = {};
+        state.employees.forEach(function(e){ roleCounts[e.role] = (roleCounts[e.role] || 0) + 1; });
+        $('role-list').innerHTML = Object.keys(roleCounts).sort().map(function(r){
+          return '<div class="set-row"><div class="s-nm" style="font-size:13.5px;">' + esc(r) + '</div><div class="s-right"><span class="badge b-grey no-dot">' + roleCounts[r] + '</span></div></div>';
+        }).join('');
+      }
+      function toggleCap(btn){
+        const on = btn.getAttribute('aria-checked') === 'true';
+        btn.setAttribute('aria-checked', String(!on));
+        toast('Permission ' + (!on ? 'enabled' : 'disabled') + ' (demo \u2014 saved for this session only).');
+      }
+      function saveSettings(){
+        toast('Working-hour settings saved for this demo session.');
+      }
+
+      /* ================= Employee mobile app ================= */
+      function mShow(screen){
+        document.querySelectorAll('.m-screen').forEach(function(s){ s.classList.remove('active'); });
+        $('m-' + screen).classList.add('active');
+        const navKey = screen === 'shift-detail' ? 'schedule' : screen === 'new-request' ? 'requests' : screen === 'notifs' ? 'home' : screen;
+        document.querySelectorAll('.m-nav-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mnav') === navKey); });
+        $('phone-scroll').scrollTop = 0;
+        if (screen === 'notifs'){
+          state.notifications.forEach(function(n){ n.unread = false; });
+          renderMobile();
+        }
+      }
+      function meShifts(){ return state.shifts.filter(function(s){ return s.emp === ME_ID; }).sort(function(a,b){ return a.day - b.day || toMin(a.start) - toMin(b.start); }); }
+      function notifHTML(n){
+        return '<div class="m-notif' + (n.unread ? ' unread' : '') + '"><div class="n-ic" style="background:' + n.bg + ';color:' + n.color + ';">' + icon(n.icon) + '</div>' +
+          '<div style="min-width:0;flex:1;"><div class="n-t">' + n.title + '</div><div class="n-b">' + n.body + '</div></div><div class="n-time">' + n.time + '</div></div>';
+      }
+      function renderMobile(){
+        const me = empById(ME_ID);
+        const mine = meShifts();
+        // Home — next shift (today is Wed, day 2; in this demo week "next" = today's shift)
+        const todayShift = mine.find(function(s){ return s.day === 2; });
+        const upcoming = mine.filter(function(s){ return s.day > 2; });
+        const weekHours = mine.reduce(function(sum, s){ return sum + shiftHours(s); }, 0);
+        $('m-hours-week').textContent = weekHours.toFixed(1);
+        $('m-leave-left').textContent = (28 - me.leaveUsed) + ' days';
+        $('m-next-shift').innerHTML = todayShift
+          ? '<div class="m-card navy"><p style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#A9C2DE;">YOUR SHIFT TODAY</p>' +
+            '<p style="font-size:24px;font-weight:800;margin:4px 0 2px;">' + todayShift.start + ' \u2013 ' + todayShift.end + '</p>' +
+            '<p class="muted" style="font-size:13px;">' + esc(todayShift.role || me.role) + ' &middot; Retail floor, Harbour &amp; Grey \u2014 High Street</p>' +
+            '<div style="margin-top:10px;">' + statusBadge(todayShift.status) + '</div></div>'
+          : '<div class="m-card"><b>No shift today</b><p style="color:var(--muted);font-size:13px;">Enjoy your day off \u2014 your next shift is listed below.</p></div>';
+        $('m-upcoming').innerHTML = upcoming.length ? upcoming.map(function(s){ return mShiftRow(s, me); }).join('') : '<p style="color:var(--muted);font-size:13px;">No more shifts this week.</p>';
+        $('m-notif-preview').innerHTML = state.notifications.slice(0, 2).map(notifHTML).join('');
+        // bell + request dots
+        const unread = state.notifications.some(function(n){ return n.unread; });
+        $('bell-dot').style.display = unread ? 'block' : 'none';
+        const myPending = state.leave.some(function(r){ return r.emp === ME_ID && r.status === 'Pending'; });
+        $('req-dot').style.display = myPending ? 'block' : 'none';
+        renderMobileSchedule();
+        renderMobileRequests();
+        renderMobileNotifs();
+        renderMobilePayslip();
+        renderMobileProfile();
+      }
+      function mShiftRow(s, me){
+        const d = weekDate(s.day);
+        return '<button class="m-shift-row" onclick="openShiftDetail(\'' + s.id + '\')">' +
+          '<span class="d-box"><span class="dw">' + DAYS[s.day] + '</span><span class="dn">' + d.getDate() + '</span></span>' +
+          '<span style="flex:1;min-width:0;"><b>' + s.start + ' \u2013 ' + s.end + '</b><br /><span style="font-size:12.5px;color:var(--muted);">' + esc(s.role || me.role) + ' &middot; High Street store</span></span>' +
+          statusBadge(s.status) + '</button>';
+      }
+      function renderMobileSchedule(){
+        const me = empById(ME_ID);
+        const mine = meShifts();
+        $('m-shift-list').innerHTML = mine.length ? mine.map(function(s){ return mShiftRow(s, me); }).join('') : '<div class="m-card" style="text-align:center;color:var(--muted);">No shifts scheduled this week.</div>';
+      }
+      function openShiftDetail(id){
+        const s = state.shifts.find(function(x){ return x.id === id; });
+        const me = empById(ME_ID);
+        if (!s) return;
+        const d = weekDate(s.day);
+        $('m-shift-detail-body').innerHTML =
+          '<div class="m-card navy"><p style="font-size:12px;font-weight:800;letter-spacing:.06em;color:#A9C2DE;">' + DAYS_FULL[s.day].toUpperCase() + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].toUpperCase() + '</p>' +
+          '<p style="font-size:25px;font-weight:800;margin:4px 0;">' + s.start + ' \u2013 ' + s.end + '</p>' +
+          '<p style="color:#A9C2DE;font-size:13px;">' + shiftHours(s).toFixed(1) + ' hours &middot; 30 min unpaid break included</p></div>' +
+          '<div class="m-card">' +
+            '<div class="pay-line"><span style="color:var(--muted);">Role</span><span class="pl-v">' + esc(s.role || me.role) + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Location</span><span class="pl-v">Harbour &amp; Grey \u2014 High Street</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Department</span><span class="pl-v">' + me.dept + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Shift manager</span><span class="pl-v">Oliver Grant</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Status</span>' + statusBadge(s.status) + '</div>' +
+          '</div>' +
+          '<button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="toast(\'Swap requests are illustrative in this demo.\')">Request a shift swap</button>';
+        mShow('shift-detail');
+      }
+      function renderMobileRequests(){
+        const mine = state.leave.filter(function(r){ return r.emp === ME_ID; });
+        $('m-request-list').innerHTML = mine.length ? mine.map(function(r){
+          return '<div class="m-card"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + typeBadge(r.type) + statusBadge(r.status) +
+            '<span style="margin-left:auto;font-weight:800;">' + reqDays(r) + (reqDays(r) === 1 ? ' day' : ' days') + '</span></div>' +
+            '<p style="font-weight:700;margin-top:9px;">' + fmtRange(r) + ' 2026</p>' +
+            '<p style="font-size:12.5px;color:var(--muted);margin-top:2px;">' + esc(r.reason) + '</p></div>';
+        }).join('') : '<div class="m-card" style="text-align:center;color:var(--muted);">You haven\u2019t submitted any requests yet.</div>';
+      }
+      function openNewRequest(type){
+        $('m-req-form').style.display = 'block';
+        $('m-req-success').style.display = 'none';
+        $('mr-type').value = type;
+        updateMobileBalanceNote();
+        mShow('new-request');
+      }
+      function updateMobileBalanceNote(){
+        const me = empById(ME_ID);
+        $('mr-balance-note').textContent = 'Your current balance: ' + (28 - me.leaveUsed) + ' of 28 days remaining.';
+      }
+      $('mr-type').addEventListener('change', updateMobileBalanceNote);
+      $('m-req-form').addEventListener('submit', function(ev){
+        ev.preventDefault();
+        const type = $('mr-type').value, startEl = $('mr-start'), endEl = $('mr-end'), reasonEl = $('mr-reason');
+        let ok = true;
+        ok = setFieldErr(startEl, !startEl.value) && ok;
+        ok = setFieldErr(endEl, !endEl.value || (startEl.value && endEl.value < startEl.value)) && ok;
+        ok = setFieldErr(reasonEl, !reasonEl.value.trim()) && ok;
+        if (!ok) return;
+        const r = { id:'r' + (++reqSeq), emp: ME_ID, type: type, start: startEl.value, end: endEl.value, reason: reasonEl.value.trim(), status:'Pending' };
+        state.leave.unshift(r);
+        pushActivity('inbox', 'var(--blue-dark)', 'var(--navy-soft)', '<b>Amelia Hart</b> submitted a new ' + type.toLowerCase() + ' request (' + fmtRange(r) + ').');
+        reasonEl.value = '';
+        $('m-req-form').style.display = 'none';
+        $('m-req-success').style.display = 'block';
+        toast('Request submitted \u2014 it\u2019s now in your manager\u2019s pending queue.');
+        refreshAll();
+      });
+      function renderMobileNotifs(){
+        $('m-notif-list').innerHTML = state.notifications.length ? state.notifications.map(notifHTML).join('') : '<p style="color:var(--muted);padding:14px 0;">No notifications yet.</p>';
+      }
+      function renderMobilePayslip(){
+        const me = empById(ME_ID);
+        function block(label, p){
+          const otPay = me.rate * 1.5 * p.ot, regPay = me.rate * p.reg, gross = regPay + otPay;
+          return '<div class="m-card"><div style="display:flex;justify-content:space-between;align-items:center;"><b>' + label + '</b><span class="demo-tag">SAMPLE</span></div>' +
+            '<p style="font-size:26px;font-weight:800;margin:8px 0 2px;">' + gbp(gross) + '</p><p style="font-size:12px;color:var(--muted);">Estimated gross pay</p>' +
+            '<div style="margin-top:10px;">' +
+            '<div class="pay-line"><span style="color:var(--muted);">Hourly rate</span><span class="pl-v">' + gbp(me.rate) + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Regular hours (' + p.reg + ')</span><span class="pl-v">' + gbp(regPay) + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Overtime hours (' + p.ot + ' @ 1.5\u00D7)</span><span class="pl-v">' + gbp(otPay) + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Total hours</span><span class="pl-v">' + (p.reg + p.ot) + '</span></div>' +
+            '</div></div>';
+        }
+        $('m-payslip-body').innerHTML = block('October 2026 \u2014 current period', state.payroll['2026-10'][ME_ID]) +
+          '<p class="m-sec-title">Previous periods</p>' + block('September 2026', state.payroll['2026-09'][ME_ID]) +
+          '<p style="font-size:12px;color:var(--faint);text-align:center;">Demo figures only \u2014 a real payslip would come from your payroll provider.</p>';
+      }
+      function renderMobileProfile(){
+        const me = empById(ME_ID);
+        const remaining = 28 - me.leaveUsed;
+        $('m-profile-body').innerHTML =
+          '<div class="m-card"><div style="display:flex;gap:13px;align-items:center;">' + avatarHTML(me, 54) +
+            '<div><b style="font-size:16.5px;">' + esc(me.name) + '</b><br /><span style="color:var(--muted);font-size:13px;">' + esc(me.role) + ' &middot; ' + me.dept + '</span><div style="margin-top:5px;">' + statusBadge(me.status) + '</div></div></div>' +
+            '<div style="margin-top:12px;">' +
+            '<div class="pay-line"><span style="color:var(--muted);">' + icon('mail') + ' Email</span><span class="pl-v" style="font-size:12px;">' + me.email + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">' + icon('phone') + ' Phone</span><span class="pl-v">' + me.phone + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Started</span><span class="pl-v">' + me.start + '</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Contracted hours</span><span class="pl-v">' + me.contracted + ' hrs/week</span></div>' +
+            '<div class="pay-line"><span style="color:var(--muted);">Hourly rate</span><span class="pl-v">' + gbp(me.rate) + '</span></div>' +
+            '</div></div>' +
+          '<div class="m-card"><b>Leave balance</b>' +
+            '<div style="display:flex;gap:18px;margin-top:8px;font-size:13px;"><span>Used: <b>' + me.leaveUsed + ' days</b></span><span>Remaining: <b style="color:var(--green-dark);">' + remaining + ' days</b></span></div>' +
+            '<div class="balance-track"><div class="balance-fill" style="width:' + Math.round(me.leaveUsed / 28 * 100) + '%;"></div></div>' +
+            '<p style="font-size:12px;color:var(--muted);">Annual allowance: 28 days</p></div>';
+      }
+
+      /* ================= Refresh & init ================= */
+      function refreshAll(){
+        renderDashboard();
+        renderDirectory();
+        renderSchedule();
+        renderLeave();
+        renderPayroll();
+        renderSettings();
+        renderMobile();
+        if (state.profileId) renderProfile();
+      }
+      seedShifts();
+      renderDeptFilter();
+      refreshAll();
+    </script>
+  </body>
+</html>
