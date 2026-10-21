@@ -161,7 +161,9 @@
 
       /* ---------- KPI cards ---------- */
       .kpi-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:16px;}
-      .kpi{display:flex; gap:14px; align-items:flex-start;}
+      .kpi-grid-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+      .kpi{display:flex; gap:14px; align-items:flex-start; min-width:0;}
+      .kpi > div:last-child{min-width:0;}
       .kpi .k-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;}
       .kpi .k-ic .ic{width:21px;height:21px;}
       .kpi .k-num{font-size:27px; font-weight:800; letter-spacing:-.02em; line-height:1.1;}
@@ -169,6 +171,7 @@
       .kpi .k-delta{font-size:12px; margin-top:3px; color:var(--muted);}
       .grid-2{display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); gap:16px; margin-bottom:16px;}
       .grid-2b{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.65fr); gap:16px; margin-bottom:16px;}
+      .grid-2a{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);}
 
       /* coverage bars */
       .cov-week{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; margin-top:14px;}
@@ -296,6 +299,7 @@
 
       /* ---------- Payroll ---------- */
       .pay-head,.pay-row{display:grid; grid-template-columns:minmax(0,1.7fr) .7fr .8fr .8fr .8fr .9fr; gap:12px; align-items:center; padding:11px 6px;}
+      .stat-3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
       .pay-head{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); border-bottom:1px solid var(--border);}
       .pay-row{border-bottom:1px solid var(--border); font-size:13.5px;}
       .pay-row:last-child{border-bottom:0;}
@@ -398,9 +402,10 @@
       }
       @media (max-width:960px){
         .layout{grid-template-columns:1fr;}
-        .sidebar{position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; padding:10px 12px; border-radius:0;}
+        .sidebar{position:static; height:auto; flex-direction:row; flex-wrap:nowrap; align-items:center; padding:10px 12px; border-radius:0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; gap:6px;}
+        .sidebar::-webkit-scrollbar{display:none;}
         .side-label{display:none;}
-        .nav-item{width:auto; padding:8px 11px;}
+        .nav-item{width:auto; padding:8px 11px; flex:none; white-space:nowrap;}
         .nav-badge{margin-left:4px;}
         .side-user{display:none;}
         .main{padding:20px 16px 50px;}
@@ -413,6 +418,8 @@
         .cov-week{grid-template-columns:repeat(2,minmax(0,1fr));}
         .qa-grid{grid-template-columns:1fr;}
         .kpi-grid{grid-template-columns:1fr;}
+        .kpi .k-num{font-size:23px;}
+        .stat-3{grid-template-columns:1fr;}
         .cal-cell{min-height:56px;}
         .cal-pill{font-size:9px;}
         .pay-head{display:none;}
@@ -613,7 +620,7 @@
               <button class="chip" data-filter="Approved" onclick="setLeaveFilter('Approved')">Approved</button>
               <button class="chip" data-filter="Declined" onclick="setLeaveFilter('Declined')">Declined</button>
             </div>
-            <div class="grid-2" style="grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);">
+            <div class="grid-2 grid-2a">
               <div id="leave-list"></div>
               <div>
                 <div class="card" style="margin-bottom:16px;">
@@ -655,7 +662,7 @@
               </select>
               <button class="btn" onclick="openReport()"><span class="ic" data-icon="file"></span> Generate report</button>
             </div>
-            <div class="kpi-grid" id="pay-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr));"></div>
+            <div class="kpi-grid kpi-grid-3" id="pay-kpis"></div>
             <div class="card">
               <h3>Employee pay breakdown</h3>
               <p class="card-sub">Overtime is paid at 1.5&times; the hourly rate. All figures are sample demonstration data.</p>
@@ -1678,7 +1685,7 @@
             '<div class="num pay-opt">' + gbp(e.rate * 1.5) + '</div><div class="num"><b>' + gbp(gross) + '</b></div></div>';
         }).join('');
         $('report-body').innerHTML =
-          '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;">' +
+          '<div class="stat-3">' +
             '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Total hours</div><div style="font-size:19px;font-weight:800;">' + t.hours.toLocaleString('en-GB') + ' hrs</div></div>' +
             '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Overtime</div><div style="font-size:19px;font-weight:800;">' + t.ot + ' hrs</div></div>' +
             '<div style="background:var(--surface-3);border:1px solid var(--border);border-radius:11px;padding:12px;"><div style="font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;">Estimated cost</div><div style="font-size:19px;font-weight:800;">' + gbp(t.cost) + '</div></div>' +
